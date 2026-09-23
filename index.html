@@ -3,18 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>__TITLE__｜yorozu-craft</title>
-  <meta name="description" content="__DESCRIPTION__">
+  <title>家電の電気代・節約額シミュレーター｜yorozu-craft</title>
+  <meta name="description" content="家電を選ぶだけで月・年の電気代の目安を計算。買い替えで何年で元が取れるか、使い方の見直しで年いくら浮くかも試算。登録不要。">
   <meta name="robots" content="index, follow">
-  <link rel="canonical" href="https://yorozu-craft.com/__REPO__/">
+  <link rel="canonical" href="https://yorozu-craft.com/denki-dai/">
 
-  <meta property="og:title" content="__TITLE__｜yorozu-craft">
-  <meta property="og:description" content="__DESCRIPTION__">
+  <meta property="og:title" content="家電の電気代・節約額シミュレーター｜yorozu-craft">
+  <meta property="og:description" content="家電を選ぶだけで月・年の電気代の目安を計算。買い替えで何年で元が取れるか、使い方の見直しで年いくら浮くかも試算。登録不要。">
   <meta property="og:type" content="website">
-  <meta property="og:url" content="https://yorozu-craft.com/__REPO__/">
+  <meta property="og:url" content="https://yorozu-craft.com/denki-dai/">
   <meta property="og:site_name" content="yorozu-craft">
   <meta property="og:locale" content="ja_JP">
-  <meta property="og:image" content="https://yorozu-craft.com/__REPO__/og-image.png">
+  <meta property="og:image" content="https://yorozu-craft.com/denki-dai/og-image.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta name="twitter:card" content="summary_large_image">
@@ -25,9 +25,9 @@
   {
     "@context": "https://schema.org",
     "@type": "WebApplication",
-    "name": "__TITLE__",
-    "description": "__DESCRIPTION__",
-    "url": "https://yorozu-craft.com/__REPO__/",
+    "name": "家電の電気代・節約額シミュレーター",
+    "description": "家電を選ぶだけで月・年の電気代の目安を計算。買い替えで何年で元が取れるか、使い方の見直しで年いくら浮くかも試算。登録不要。",
+    "url": "https://yorozu-craft.com/denki-dai/",
     "applicationCategory": "UtilitiesApplication",
     "operatingSystem": "All",
     "offers": { "@type": "Offer", "price": "0", "priceCurrency": "JPY" },
@@ -42,33 +42,113 @@
 
   <link rel="icon" href="./favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="./apple-touch-icon.png">
-  <!-- PWA-BEGIN -->
-  <link rel="manifest" href="./manifest.webmanifest">
-  <!-- PWA-END -->
   <link rel="stylesheet" href="./style.css">
+  <!-- 家電の行は main.js で描くので、描き終わるまで本体を見えなくしてレイアウトのずれ（CLS）を防ぐ。3 秒たったら必ず見せる -->
+  <script>document.documentElement.classList.add('js-loading');setTimeout(function(){document.documentElement.classList.remove('js-loading');},3000);</script>
 </head>
 <body>
 
   <header class="app-header">
-    <h1>__TITLE__</h1>
-    <p class="subtitle">__DESCRIPTION__</p>
+    <h1>家電の電気代・節約額シミュレーター</h1>
+    <p class="subtitle">家電を選ぶだけで月・年の電気代の目安を計算。買い替えで何年で元が取れるか、使い方の見直しで年いくら浮くかも試算。登録不要。</p>
   </header>
 
   <main class="app-main">
 
-    <!-- ここにツール本体を書く（例: 金額を 100 円単位で切り上げる） -->
-    <section class="card" aria-labelledby="tool-heading">
-      <h2 id="tool-heading">計算</h2>
+    <p class="badge" id="asof">電気料金の目安単価（<span id="asof-price">31 円/kWh・全国家庭電気製品公正取引協議会</span>）で計算・入力は外部に送信しません</p>
+
+    <!-- 1. 単価 -->
+    <section class="card" aria-labelledby="h-price">
+      <h2 id="h-price">電気料金の単価</h2>
       <div class="field">
-        <label for="amount">金額</label>
-        <p class="hint">入力内容はこの端末のブラウザにだけ保存され、外部には送信されません。</p>
-        <input type="number" id="amount" inputmode="numeric" placeholder="例：1234">
+        <label for="unit-price">1kWh あたりの単価（円）</label>
+        <p class="hint">検針票の「請求額 ÷ 使用量（kWh）」で、ご自宅の単価のだいたいの値が出せます。既定は家電のカタログで使われる目安単価です。</p>
+        <div class="with-unit">
+          <input type="number" id="unit-price" inputmode="decimal" min="1" max="200" step="0.1">
+          <button type="button" class="btn btn-sub" id="reset-price">目安単価に戻す</button>
+        </div>
       </div>
-      <p>結果：<strong id="result" aria-live="polite">—</strong></p>
-      <button type="button" id="share" class="btn">結果を開くリンクをコピー</button>
     </section>
 
-    <p class="small"><a href="./guide.html">使い方・よくある質問・ご利用上の注意</a></p>
+    <!-- 2. 家電リスト -->
+    <section class="card" aria-labelledby="h-items">
+      <h2 id="h-items">家の家電</h2>
+      <p class="small">品目を押して足し、行ごとに数字を直します。W（消費電力）と kWh/年（年間消費電力量）は、本体の表示やカタログの値にすると正確になります。</p>
+      <div class="chips" id="presets" role="group" aria-label="品目を足す"></div>
+      <div id="items" class="items"></div>
+    </section>
+
+    <!-- 3. 結果 -->
+    <section class="card result" aria-labelledby="h-result" aria-live="polite">
+      <h2 id="h-result">電気代の目安</h2>
+      <div id="warnings" class="msg msg-warn" hidden></div>
+      <dl class="kpi">
+        <div><dt>1 か月</dt><dd id="k-month">—</dd></div>
+        <div><dt>1 年</dt><dd id="k-year">—</dd></div>
+        <div><dt>電力量（1 か月）</dt><dd id="k-kwh">—</dd></div>
+      </dl>
+      <h3 class="sub">電気代を多く使っている家電</h3>
+      <div id="ranking" class="ranking"></div>
+    </section>
+
+    <!-- 4. 節約 -->
+    <section class="card" aria-labelledby="h-save">
+      <h2 id="h-save">節約シミュレーション</h2>
+      <div class="tabs" role="tablist" aria-label="節約の方法">
+        <button type="button" role="tab" id="tab-usage" aria-controls="panel-usage" aria-selected="true">使い方の見直し</button>
+        <button type="button" role="tab" id="tab-rep" aria-controls="panel-rep" aria-selected="false" tabindex="-1">買い替え</button>
+      </div>
+
+      <div id="panel-usage" role="tabpanel" aria-labelledby="tab-usage">
+        <div class="field">
+          <label for="cut-hours">使用時間を 1 日あたり何時間短くするか</label>
+          <select id="cut-hours">
+            <option value="0.5">30 分</option>
+            <option value="1">1 時間</option>
+            <option value="2">2 時間</option>
+          </select>
+        </div>
+        <p class="small">上の家電リストに入っている品目について、節約できる額の大きい順に並べます。エアコン・冷蔵庫などの施策は、資源エネルギー庁の省エネポータルの値（条件つき）です。</p>
+        <ol id="tips" class="tips"></ol>
+      </div>
+
+      <div id="panel-rep" role="tabpanel" aria-labelledby="tab-rep" hidden>
+        <div class="field">
+          <label for="rep-method">比べる値</label>
+          <select id="rep-method">
+            <option value="annual">年間消費電力量（kWh/年。冷蔵庫・エアコンなど）</option>
+            <option value="wh">消費電力（W）と使用時間</option>
+          </select>
+        </div>
+        <div class="grid2">
+          <div class="field"><label for="rep-old" id="rep-old-label">今の製品</label><input type="number" id="rep-old" inputmode="decimal" min="0" step="1"></div>
+          <div class="field"><label for="rep-new" id="rep-new-label">買い替える製品</label><input type="number" id="rep-new" inputmode="decimal" min="0" step="1"></div>
+        </div>
+        <div class="grid2" id="rep-wh" hidden>
+          <div class="field"><label for="rep-hours">1 日の使用時間（時間）</label><input type="number" id="rep-hours" inputmode="decimal" min="0" max="24" step="0.5"></div>
+          <div class="field"><label for="rep-days">1 か月の使用日数（日）</label><input type="number" id="rep-days" inputmode="numeric" min="0" max="31" step="1"></div>
+        </div>
+        <div class="grid2">
+          <div class="field"><label for="rep-qty">台数</label><input type="number" id="rep-qty" inputmode="numeric" min="1" max="99" step="1"></div>
+          <div class="field"><label for="rep-price">買い替える製品の価格（円）</label><input type="number" id="rep-price" inputmode="numeric" min="0" step="1000"></div>
+        </div>
+        <dl class="kpi" id="rep-result">
+          <div><dt>1 年の電気代の差</dt><dd id="r-saving">—</dd></div>
+          <div><dt>元が取れるまで</dt><dd id="r-years">—</dd></div>
+        </dl>
+        <p class="small" id="r-detail"></p>
+        <h3 class="sub">買い替えの目安（10 年前の製品との比較）</h3>
+        <ul id="rep-hints" class="small-list"></ul>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="btn-row">
+        <button type="button" class="btn btn-sub" id="share">この家電リストを開くリンクをコピー</button>
+      </div>
+      <p id="share-msg" class="small" aria-live="polite"></p>
+      <p class="small">試算は目安です。実際の電気代は、機種・使い方・契約（料金プランや燃料費調整額など）によって変わります。<a href="./guide.html">使い方・電気代の計算方法・よくある質問</a></p>
+    </section>
 
   </main>
 
@@ -76,7 +156,7 @@
     <nav class="footer-nav" aria-label="フッターナビゲーション">
       <ul>
         <li><a href="../">yorozu-craft トップ</a></li>
-        <li><a href="./" aria-current="page">__TITLE__</a></li>
+        <li><a href="./" aria-current="page">家電の電気代・節約額シミュレーター</a></li>
         <li><a href="./guide.html">使い方・よくある質問</a></li>
         <li><a href="../about.html">運営者情報</a></li>
         <li><a href="../privacy-policy.html">プライバシーポリシー</a></li>

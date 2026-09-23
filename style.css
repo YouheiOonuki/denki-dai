@@ -1,5 +1,5 @@
 /* ===========================
-   __TITLE__ — yorozu-craft 共通の和紙風の配色
+   家電の電気代・節約額シミュレーター — yorozu-craft 共通の和紙風の配色
    色はトークン（--bg / --card / --text / --muted / --accent / --border）だけを使う。
    ダークモードは端末の設定に自動で合わせる（prefers-color-scheme。手動切替は付けない）
    =========================== */
@@ -54,7 +54,7 @@ a { color: var(--accent); }
 .app-header .subtitle { font-size: 0.88rem; color: var(--muted); margin-top: 0.3rem; }
 
 /* レイアウト */
-.app-main { max-width: 680px; margin: 0 auto; padding: 1rem; }
+.app-main { max-width: 760px; margin: 0 auto; padding: 1rem; }
 .card {
   background: var(--card);
   border: 1px solid var(--border);
@@ -125,6 +125,67 @@ a { color: var(--accent); }
 .footer-nav a { color: var(--muted); text-decoration: none; }
 .footer-nav a:hover, .footer-nav a[aria-current="page"] { color: var(--accent); }
 
+/* ===== 家電の電気代・節約額シミュレーター固有 ===== */
+.js-loading .app-main { visibility: hidden; }
+:root { --warn-bg: #fff4d6; --warn-border: #d9a520; --bar: #8b4513; }
+@media (prefers-color-scheme: dark) {
+  :root { --warn-bg: #3a3020; --warn-border: #a88420; --bar: #e0a066; }
+}
+.badge { text-align: center; font-size: 0.8rem; color: var(--muted); margin-bottom: 0.8rem; }
+.badge.is-stale { color: #b3261e; }
+.grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); gap: 0 1rem; }
+.with-unit { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
+.with-unit input { max-width: 8rem !important; }
+.btn-row { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.2rem 0 0.4rem; }
+.btn-sub { background: var(--accent-soft); color: var(--accent); border: 1px solid var(--border); padding: 0.4rem 0.8rem; font-size: 0.88rem; }
+.btn:disabled { opacity: 0.5; cursor: default; }
+.msg { border-radius: 6px; padding: 0.6rem 0.8rem; margin-bottom: 0.8rem; font-size: 0.88rem; }
+.msg-warn { background: var(--warn-bg); border: 1px solid var(--warn-border); }
+
+.chips { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0.6rem 0 0.8rem; }
+.chip { border: 1px solid var(--border); background: var(--accent-soft); color: var(--accent); border-radius: 999px; padding: 0.3rem 0.75rem; font-size: 0.85rem; font-family: inherit; cursor: pointer; }
+.chip:focus-visible, .icon-btn:focus-visible, .tabs button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.item { border-top: 1px dashed var(--border); padding: 0.6rem 0; }
+.item-head { display: flex; align-items: center; gap: 0.5rem; }
+.item-name { flex: 1; min-width: 0; font-weight: 600; font-size: 0.95rem; padding: 0.3rem 0.4rem; border: 1px solid transparent; border-radius: 6px; background: transparent; color: var(--text); font-family: inherit; }
+.item-name:hover, .item-name:focus { border-color: var(--border); background: var(--card); }
+.item-cost { font-size: 0.88rem; color: var(--accent); font-weight: 700; white-space: nowrap; }
+.icon-btn { background: none; border: none; color: var(--accent); cursor: pointer; font-size: 1.2rem; line-height: 1; padding: 0.2rem 0.5rem; }
+.item-body { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 0.4rem 0.6rem; margin-top: 0.3rem; }
+.item-body select { padding: 0.35rem 0.4rem; font-size: 0.9rem; border: 1px solid var(--border); border-radius: 6px; background: var(--card); color: var(--text); }
+.mini { display: flex; flex-direction: column; font-size: 0.72rem; color: var(--muted); }
+.mini input { padding: 0.3rem 0.4rem; font-size: 1rem; border: 1px solid var(--border); border-radius: 6px; background: var(--card); color: var(--text); }
+.mini.w3 input { width: 3.6rem; } .mini.w4 input { width: 4.6rem; } .mini.w5 input { width: 5.4rem; } .mini.w6 input { width: 6.4rem; }
+.item-hint { font-size: 0.75rem; color: var(--muted); margin-top: 0.3rem; }
+
+.kpi { display: grid; grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr)); gap: 0.6rem; margin-bottom: 0.6rem; }
+.kpi > div { background: var(--accent-soft); border-radius: 8px; padding: 0.6rem 0.8rem; }
+.kpi dt { font-size: 0.8rem; color: var(--muted); }
+.kpi dd { font-size: 1.25rem; font-weight: 700; line-height: 1.4; }
+h3.sub { font-size: 0.92rem; margin: 0.8rem 0 0.4rem; }
+.ranking svg { width: 100%; height: auto; display: block; }
+.ranking .bar { fill: var(--bar); }
+.ranking .bar-label { fill: var(--text); font-size: 26px; }
+.ranking .bar-value { fill: var(--muted); font-size: 25px; }
+
+.tabs { display: flex; gap: 0.3rem; border-bottom: 1px solid var(--border); margin-bottom: 0.8rem; }
+.tabs button { background: none; border: none; border-bottom: 3px solid transparent; padding: 0.4rem 0.9rem; font-size: 0.92rem; color: var(--muted); cursor: pointer; font-family: inherit; }
+.tabs button[aria-selected="true"] { color: var(--accent); border-bottom-color: var(--accent); font-weight: 700; }
+.tips { padding-left: 1.3rem; }
+.tips li { font-size: 0.9rem; margin: 0.45rem 0; }
+.tips strong { color: var(--accent); }
+.tip-note { display: block; font-size: 0.75rem; color: var(--muted); }
+.small-list { padding-left: 1.2rem; font-size: 0.85rem; }
+.small-list .src { list-style: none; margin-left: -1.2rem; font-size: 0.75rem; color: var(--muted); }
+
 @media (max-width: 480px) {
   .app-header h1 { font-size: 1.2rem; }
 }
+
+/* 使い方ページの表 */
+.table-wrap { overflow-x: auto; margin: 0.4rem 0; }
+.tbl { border-collapse: collapse; width: 100%; font-size: 0.82rem; }
+.tbl th, .tbl td { border-bottom: 1px solid var(--border); padding: 0.35rem 0.45rem; text-align: left; vertical-align: top; }
+.tbl thead th { color: var(--muted); }
+.tbl td:last-child { white-space: nowrap; }
