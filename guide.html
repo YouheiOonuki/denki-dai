@@ -3,18 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>使い方・よくある質問｜__TITLE__｜yorozu-craft</title>
-  <meta name="description" content="__TITLE__の使い方、計算の根拠、よくある質問、ご利用上の注意。">
+  <title>家電の電気代の計算方法と節約の効果・使い方｜家電の電気代・節約額シミュレーター｜yorozu-craft</title>
+  <meta name="description" content="家電の電気代の計算方法（W×時間、年間消費電力量）、目安単価31円/kWhと省エネラベル27円の違い、エアコン・冷蔵庫・照明などの節約の効果（資源エネルギー庁の値）と、シミュレーターの使い方。">
   <meta name="robots" content="index, follow">
-  <link rel="canonical" href="https://yorozu-craft.com/__REPO__/guide.html">
+  <link rel="canonical" href="https://yorozu-craft.com/denki-dai/guide.html">
 
-  <meta property="og:title" content="使い方・よくある質問｜__TITLE__">
-  <meta property="og:description" content="__TITLE__の使い方、計算の根拠、よくある質問、ご利用上の注意。">
+  <meta property="og:title" content="家電の電気代の計算方法と節約の効果・使い方｜家電の電気代・節約額シミュレーター">
+  <meta property="og:description" content="家電の電気代の計算方法（W×時間、年間消費電力量）、目安単価31円/kWhと省エネラベル27円の違い、エアコン・冷蔵庫・照明などの節約の効果（資源エネルギー庁の値）と、シミュレーターの使い方。">
   <meta property="og:type" content="article">
-  <meta property="og:url" content="https://yorozu-craft.com/__REPO__/guide.html">
+  <meta property="og:url" content="https://yorozu-craft.com/denki-dai/guide.html">
   <meta property="og:site_name" content="yorozu-craft">
   <meta property="og:locale" content="ja_JP">
-  <meta property="og:image" content="https://yorozu-craft.com/__REPO__/og-image.png">
+  <meta property="og:image" content="https://yorozu-craft.com/denki-dai/og-image.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta name="twitter:card" content="summary_large_image">
@@ -27,13 +27,67 @@
     "mainEntity": [
       {
         "@type": "Question",
-        "name": "無料で使えますか？",
-        "acceptedAnswer": { "@type": "Answer", "text": "はい。会員登録やインストールも不要で、ブラウザだけで使えます。" }
+        "name": "電気代はどうやって計算していますか？",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "消費電力（W）× 1 日の使用時間 × 使用日数 ÷ 1000 で電力量（kWh）を出し、電気料金の単価（円/kWh）を掛けています。冷蔵庫やエアコンのように、カタログに年間消費電力量（kWh/年）が載っている家電は、その値 ÷ 12 を 1 か月分にしています。"
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "単価の 31 円/kWh は何の値ですか？",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "全国家庭電気製品公正取引協議会（家電公取協）が、家電のカタログなどで電気代の目安を示すために定めている目安単価です（2022 年 7 月改定、税込）。実際の単価は契約や使用量で変わるので、検針票の「請求額 ÷ 使用量」でご自宅の単価に直すと、より実際に近くなります。"
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "店頭の省エネラベルの電気代と合わないのはなぜですか？",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "店頭の統一省エネラベルや省エネ性能カタログの「年間の目安電気料金」は、1kWh あたり 27 円で計算されています。このツールの既定は家電公取協の 31 円なので、同じ年間消費電力量でも金額が 1.15 倍ほどになります。単価の欄を 27 にすると、ラベルと同じ金額になります。"
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "エアコンと冷蔵庫の初期値は何ですか？",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "資源エネルギー庁の省エネ性能カタログ 2025 年版に載っている製品の平均値です。エアコンは冷房能力 2.2kW（6 畳用）の期間消費電力量の平均 678kWh、冷蔵庫は定格内容積 401〜450L の年間消費電力量の平均 286kWh です。お手持ちの製品の値（本体のラベルや取扱説明書）に直すと正確になります。"
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "電子レンジやドライヤーの W が空欄なのはなぜですか？",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "公式の資料で目安の消費電力が示されていない品目は、根拠のない数字を入れないよう空欄にしています。本体の銘板や取扱説明書の消費電力（W）を入れてください。"
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "待機電力はどう数えていますか？",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "待機電力（W）を入れると、1 か月（365÷12 日）の全時間から使っている時間を引いた時間ぶんを数えます。使わない日もコンセントに差したままの状態を想定しています。"
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "「元が取れる年数」はどう計算していますか？",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "買い替える製品の価格 ÷ 1 年の電気代の差です。電気代が下がらない（差が 0 以下の）ときは「元は取れない」と表示します。買い替えの費用には、処分費用や工事費は入っていません。"
+        }
       },
       {
         "@type": "Question",
         "name": "入力した内容はどこに保存されますか？",
-        "acceptedAnswer": { "@type": "Answer", "text": "お使いのブラウザの中にだけ保存され、外部のサーバーには送信されません。" }
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "お使いのブラウザの中にだけ保存され、外部のサーバーには送信されません。"
+        }
       }
     ]
   }
@@ -51,38 +105,97 @@
 <body>
 
   <header class="app-header">
-    <h1>__TITLE__ の使い方</h1>
+    <h1>家電の電気代・節約額シミュレーター の使い方</h1>
     <p class="subtitle">使い方・計算の根拠・よくある質問・ご利用上の注意</p>
   </header>
 
   <main class="app-main">
 
-    <p class="card" style="text-align:center"><a href="./">▶ __TITLE__ を使う</a></p>
+    <p class="card" style="text-align:center"><a href="./">▶ 家電の電気代・節約額シミュレーターを使う</a></p>
+
+    <nav class="card content" aria-label="このページの目次">
+      <h2>目次</h2>
+      <ol>
+        <li><a href="#howto">使い方</a></li>
+        <li><a href="#calc">電気代の計算方法</a></li>
+        <li><a href="#catalog">カタログ・省エネラベルの見方</a></li>
+        <li><a href="#effects">よくある節約の効果</a></li>
+        <li><a href="#basis">根拠と確認日</a></li>
+        <li><a href="#faq">よくある質問</a></li>
+        <li><a href="#notes">ご利用上の注意・データの扱い</a></li>
+        <li><a href="#changelog">更新履歴</a></li>
+      </ol>
+    </nav>
 
     <article class="card content" id="howto">
       <h2>使い方</h2>
       <ol>
-        <li>（手順を書く）</li>
+        <li><strong>単価</strong>：既定は目安単価 31 円/kWh です。検針票があれば「請求額 ÷ 使用量（kWh）」でご自宅の単価に直せます。</li>
+        <li><strong>家電を足す</strong>：品目のボタンを押すと、目安の値が入った行が足されます。W（消費電力）・使う時間・日数・台数を、お手持ちの製品や使い方に合わせて直します。</li>
+        <li><strong>結果</strong>：1 か月・1 年の電気代と、電気代を多く使っている家電の順位が出ます。</li>
+        <li><strong>使い方の見直し</strong>：使用時間を短くする、待機電力を切る、エアコンの設定温度を変えるなどで、年いくら浮くかを大きい順に並べます。</li>
+        <li><strong>買い替え</strong>：今の製品と買い替える製品の年間消費電力量（または W）と価格を入れると、1 年の電気代の差と、何年で元が取れるかが出ます。</li>
       </ol>
+      <p>家電リストは、この端末のブラウザに自動で保存されます。「リンクをコピー」で家族に送ることもできます。</p>
     </article>
 
-    <!-- 制度・単価など時点のある値を使うツールだけ残す。値は constants.js、画面にも時点を出す -->
+    <article class="card content" id="calc">
+      <h2>電気代の計算方法</h2>
+      <h3>消費電力（W）と使用時間から</h3>
+      <p><code>電力量（kWh）＝ 消費電力（W）× 1 日の使用時間 × 使用日数 ÷ 1000</code>、<code>電気代 ＝ 電力量 × 単価（円/kWh）</code></p>
+      <p>例：1000W の家電を 1 日 1 時間、30 日使うと 30kWh。単価 31 円なら 1 か月 930 円です。</p>
+      <h3>年間消費電力量（kWh/年）から</h3>
+      <p>冷蔵庫・エアコンなどは、カタログや本体に 1 年間の電力量が載っています。<code>1 か月の電気代 ＝ 年間消費電力量 ÷ 12 × 単価</code>。例：年 300kWh・31 円なら 1 か月 775 円、1 年 9,300 円です。</p>
+      <h3>待機電力</h3>
+      <p>リモコンの待ち受けなど、使っていないときにも使われる電力です。本体の表示に「待機時消費電力」があれば、行の「待機 W」に入れると 1 か月ぶんを足して計算します。主電源を切る、長く使わない家電はプラグを抜くと減らせます。</p>
+    </article>
+
+    <article class="card content" id="catalog">
+      <h2>カタログ・省エネラベルの見方</h2>
+      <ul>
+        <li><strong>エアコンの「期間消費電力量」</strong>：東京の気候・決められた条件で 1 年間（冷房期間と暖房期間）使ったときの電力量です。同じ省エネ性能でも、冷房能力（kW）が大きいほど多くなります。部屋の広さに合った能力を選ぶのが省エネの基本です。</li>
+        <li><strong>冷蔵庫の「年間消費電力量」</strong>：JIS で決められた方法で測った 1 年間の電力量です。容量が大きいほど増える傾向ですが、省エネ性能の高い大型のほうが少ないこともあります。</li>
+        <li><strong>「年間の目安電気料金」</strong>：統一省エネラベル・省エネ性能カタログでは 1kWh あたり 27 円（税込）で計算されています。このツールの既定（家電公取協の 31 円）とは単価が違うため、ラベルと金額を合わせたいときは単価を 27 にしてください。</li>
+      </ul>
+    </article>
+
+    <article class="card content" id="effects">
+      <h2>よくある節約の効果（資源エネルギー庁の値）</h2>
+      <p>省エネポータルサイト「無理のない省エネ節約」に載っている、1 年間の節約の目安です（金額は 31 円/kWh で計算）。条件はそれぞれの資料のとおりです。</p>
+      <div class="table-wrap"><table class="tbl" id="effects-table">
+        <thead><tr><th scope="col">家電</th><th scope="col">やること</th><th scope="col">年間の節約</th></tr></thead>
+        <tbody></tbody>
+      </table></div>
+      <p class="small">買い替えの目安（省エネポータル「機器の買換で省エネ節約」）：冷蔵庫は 10 年前と比べて約 15〜24%、エアコンは約 13%、温水洗浄便座は約 9% の省エネ。電球形 LED ランプは白熱電球と比べて約 86% の省エネです。</p>
+    </article>
+
     <article class="card content" id="basis">
       <h2>根拠と確認日</h2>
+      <ul id="sources"></ul>
       <dl class="info-list">
-        <dt>根拠</dt>
-        <dd>（法令・公式ページの名前）</dd>
         <dt>最終確認日</dt>
-        <dd><time datetime="__DATE__">__DATE_JA__</time></dd>
+        <dd><time datetime="" id="checked"></time></dd>
       </dl>
-      <p class="small">制度や単価は変わることがあります。最終確認日から時間がたっている場合は、公式ページで最新の情報をご確認ください。</p>
+      <p class="small">目安単価や資料の値は改定されることがあります。年に 1 回、出典を確認し直します。</p>
     </article>
 
     <article class="card content" id="faq">
       <h2>よくある質問</h2>
       <dl class="faq">
-        <dt>無料で使えますか？</dt>
-        <dd>はい。会員登録やインストールも不要で、ブラウザだけで使えます。</dd>
+        <dt>電気代はどうやって計算していますか？</dt>
+        <dd>消費電力（W）× 1 日の使用時間 × 使用日数 ÷ 1000 で電力量（kWh）を出し、電気料金の単価（円/kWh）を掛けています。冷蔵庫やエアコンのように、カタログに年間消費電力量（kWh/年）が載っている家電は、その値 ÷ 12 を 1 か月分にしています。</dd>
+        <dt>単価の 31 円/kWh は何の値ですか？</dt>
+        <dd>全国家庭電気製品公正取引協議会（家電公取協）が、家電のカタログなどで電気代の目安を示すために定めている目安単価です（2022 年 7 月改定、税込）。実際の単価は契約や使用量で変わるので、検針票の「請求額 ÷ 使用量」でご自宅の単価に直すと、より実際に近くなります。</dd>
+        <dt>店頭の省エネラベルの電気代と合わないのはなぜですか？</dt>
+        <dd>店頭の統一省エネラベルや省エネ性能カタログの「年間の目安電気料金」は、1kWh あたり 27 円で計算されています。このツールの既定は家電公取協の 31 円なので、同じ年間消費電力量でも金額が 1.15 倍ほどになります。単価の欄を 27 にすると、ラベルと同じ金額になります。</dd>
+        <dt>エアコンと冷蔵庫の初期値は何ですか？</dt>
+        <dd>資源エネルギー庁の省エネ性能カタログ 2025 年版に載っている製品の平均値です。エアコンは冷房能力 2.2kW（6 畳用）の期間消費電力量の平均 678kWh、冷蔵庫は定格内容積 401〜450L の年間消費電力量の平均 286kWh です。お手持ちの製品の値（本体のラベルや取扱説明書）に直すと正確になります。</dd>
+        <dt>電子レンジやドライヤーの W が空欄なのはなぜですか？</dt>
+        <dd>公式の資料で目安の消費電力が示されていない品目は、根拠のない数字を入れないよう空欄にしています。本体の銘板や取扱説明書の消費電力（W）を入れてください。</dd>
+        <dt>待機電力はどう数えていますか？</dt>
+        <dd>待機電力（W）を入れると、1 か月（365÷12 日）の全時間から使っている時間を引いた時間ぶんを数えます。使わない日もコンセントに差したままの状態を想定しています。</dd>
+        <dt>「元が取れる年数」はどう計算していますか？</dt>
+        <dd>買い替える製品の価格 ÷ 1 年の電気代の差です。電気代が下がらない（差が 0 以下の）ときは「元は取れない」と表示します。買い替えの費用には、処分費用や工事費は入っていません。</dd>
         <dt>入力した内容はどこに保存されますか？</dt>
         <dd>お使いのブラウザの中にだけ保存され、外部のサーバーには送信されません。</dd>
       </dl>
@@ -92,18 +205,18 @@
     <article class="card content" id="notes">
       <h2>ご利用上の注意・データの扱い</h2>
       <ul>
-        <li><strong>保存されるデータ</strong>：（何をブラウザに保存するか。保存しないならそう書く）</li>
-        <li><strong>共有リンク</strong>：（共有機能があれば、リンクに何が含まれるか。URL の「#」以降に入るのでサーバーには送信されない）</li>
-        <li><strong>結果の扱い</strong>：（計算結果は目安であること、最終的な確認先など）</li>
+        <li><strong>結果の扱い</strong>：目安の値で試算しているため、実際の電気代は機種・使い方・季節・契約（料金プラン、燃料費調整額、再エネ賦課金など）によって変わります。</li>
+        <li><strong>保存されるデータ</strong>：家電リストと単価を、お使いのブラウザにだけ保存します。外部のサーバーには送信しません。</li>
+        <li><strong>共有リンク</strong>：「リンクをコピー」で作るリンクには、家電リストが含まれます。リストは URL の「#」以降に入っているため、リンクを開いても当サイトのサーバーには送信されません。リンクを渡した相手にはリストが見えます。</li>
       </ul>
-      <p><a href="https://docs.google.com/forms/d/e/1FAIpQLSd8B90qh5lEIyr25iw1jOjdQjOyaPZ1_z2wMB4kH-EmEeJYWw/viewform?usp=pp_url&amp;entry.585564634=__REPO__" target="_blank" rel="noopener">ご要望・不具合の報告（Google フォーム）</a>：いただいた内容をもとに直します。お返事はしていません。</p>
+      <p><a href="https://docs.google.com/forms/d/e/1FAIpQLSd8B90qh5lEIyr25iw1jOjdQjOyaPZ1_z2wMB4kH-EmEeJYWw/viewform?usp=pp_url&amp;entry.585564634=denki-dai" target="_blank" rel="noopener">ご要望・不具合の報告（Google フォーム）</a>：いただいた内容をもとに直します。お返事はしていません。</p>
       <p>サイト全体の運営者情報・免責事項は<a href="../about.html">こちら</a>、プライバシーポリシーは<a href="../privacy-policy.html">こちら</a>です（すべてのツールで共通）。</p>
     </article>
 
     <article class="card content" id="changelog">
       <h2>更新履歴</h2>
       <ul>
-        <li><time datetime="__DATE__">__DATE_JA__</time> 公開</li>
+        <li><time datetime="2026-09-23">2026年9月23日</time> 公開</li>
       </ul>
     </article>
 
@@ -113,7 +226,7 @@
     <nav class="footer-nav" aria-label="フッターナビゲーション">
       <ul>
         <li><a href="../">yorozu-craft トップ</a></li>
-        <li><a href="./">__TITLE__</a></li>
+        <li><a href="./">家電の電気代・節約額シミュレーター</a></li>
         <li><a href="./guide.html" aria-current="page">使い方・よくある質問</a></li>
         <li><a href="../about.html">運営者情報</a></li>
         <li><a href="../privacy-policy.html">プライバシーポリシー</a></li>
@@ -122,6 +235,33 @@
     <p>&copy; 2026 yorozu-craft. All rights reserved.</p>
   </footer>
 
+  <script src="./constants.js"></script>
+  <script>
+    // 出典・確認日・節約の効果の表は constants.js（画面と同じもの）から出す
+    (function () {
+      var K = window.Constants, ul = document.getElementById('sources');
+      Object.keys(K.SOURCES).forEach(function (k) {
+        if (k === 'user') return;
+        var x = K.SOURCES[k], li = document.createElement('li'), a = document.createElement('a');
+        a.href = x.url; a.rel = 'noopener'; a.target = '_blank'; a.textContent = x.publisher + '「' + x.label + '」';
+        li.appendChild(a); if (x.note) li.appendChild(document.createTextNode('：' + x.note));
+        ul.appendChild(li);
+      });
+      var NAMES = { aircon: 'エアコン', fridge: '冷蔵庫', tv: 'テレビ', incandescent: '照明', fluorescent: '照明', pot: '電気ポット', toilet: '温水洗浄便座' };
+      var tb = document.querySelector('#effects-table tbody');
+      Object.keys(K.TIPS).forEach(function (kind) {
+        K.TIPS[kind].forEach(function (t) {
+          var tr = document.createElement('tr');
+          [NAMES[kind] || kind, t.label + '（' + t.condition + '）', t.kwhYear.toFixed(2) + ' kWh・約 ' + Math.round(t.kwhYear * K.UNIT_PRICE.value).toLocaleString('ja-JP') + ' 円'].forEach(function (v, i) {
+            var c = document.createElement(i === 0 ? 'th' : 'td'); if (i === 0) c.scope = 'row'; c.textContent = v; tr.appendChild(c);
+          });
+          tb.appendChild(tr);
+        });
+      });
+      var d = K.CHECKED.split('-'), t = document.getElementById('checked');
+      t.dateTime = K.CHECKED; t.textContent = d[0] + '年' + (+d[1]) + '月' + (+d[2]) + '日';
+    })();
+  </script>
   <!-- Cloudflare Web Analytics（Cookie を使わないアクセス解析） --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "b79bf821e1fd4b6683866d493b1de426"}'></script><!-- End Cloudflare Web Analytics -->
 </body>
 </html>
