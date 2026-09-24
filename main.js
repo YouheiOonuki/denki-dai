@@ -324,6 +324,34 @@
     if (tooLong) $('share-msg').textContent = '家電が多いためリンクが長くなりすぎます。品目を減らすと共有できます（この端末には自動で保存されています）。';
   }
 
+  // --- ファイルへの書き出し・読み込み（README「ツールを追加するとき」20。決定 D31） ---
+  // 中身はこの端末の中で作り、どこにも送信しない。機種変更のときはファイルを移して読み込む
+  var TOOL = 'denki-dai';
+  $('backup-export').addEventListener('click', function () {
+    var blob = new Blob([JSON.stringify(Calc.buildBackup(TOOL, { draft: state }), null, 2)], { type: 'application/json' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = Calc.backupFileName(TOOL);
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
+    $('share-msg').textContent = 'ファイルに書き出しました。機種変更のときは、このファイルを新しい端末に移して「ファイルから読み込む」を押してください。';
+  });
+  $('backup-import').addEventListener('click', function () { $('backup-file').click(); });
+  $('backup-file').addEventListener('change', function () {
+    var file = this.files && this.files[0];
+    this.value = '';
+    if (!file) return;
+    if (file.size > 1024 * 1024) { $('share-msg').textContent = 'ファイルが大きすぎます。このツールで書き出したファイルを選んでください。'; return; }
+    file.text().then(function (text) {
+      var r = Calc.parseBackup(text, TOOL, ['draft']);
+      if (!r.ok) { $('share-msg').textContent = r.error; return; }
+      if (!window.confirm('ファイルの内容で、今の家電リストと単価を置き換えます。よろしいですか？')) return;
+      state = normalize(r.data.draft); fromShare = false;
+      fillForm(); update();
+      $('share-msg').textContent = 'ファイルから読み込みました（家電 ' + state.items.length + ' 品目）。';
+    }, function () { $('share-msg').textContent = 'ファイルを読み取れませんでした。'; });
+  });
+
   // --- 全体の更新 ---
   function update() {
     if (!fromShare) store.set('draft', state);
@@ -350,13 +378,17 @@
     }
   })();
 
-  $('unit-price').value = state.unitPrice;
-  $('cut-hours').value = String(state.cutHours);
-  $('rep-method').value = state.rep.method;
-  Object.keys(repIds).forEach(function (k) { $(repIds[k]).value = state.rep[k]; });
-  syncRep();
-  selectTab(state.tab);
-  renderItems();
+  // 入力欄を state に合わせる（起動時と、ファイルから読み込んだとき）
+  function fillForm() {
+    $('unit-price').value = state.unitPrice;
+    $('cut-hours').value = String(state.cutHours);
+    $('rep-method').value = state.rep.method;
+    Object.keys(repIds).forEach(function (k) { $(repIds[k]).value = state.rep[k]; });
+    syncRep();
+    selectTab(state.tab);
+    renderItems();
+  }
+  fillForm();
   update();
   document.documentElement.classList.remove('js-loading');
 })();
