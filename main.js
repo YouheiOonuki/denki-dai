@@ -143,7 +143,50 @@
     wrap.appendChild(span); wrap.appendChild(inp);
     return wrap;
   }
+  // 使用時間は「家の家電」（結果の前）と「品目を足す・数字を直す」（結果の後ろ）の 2 か所に出すので、片方を直したらもう片方にも写す
+  function hoursField(it, i) {
+    var w = field('時間/日', it.hours, { min: 0, max: 24, step: 0.25, inputmode: 'decimal', 'aria-label': it.name + 'の 1 日の使用時間' }, function (v) {
+      it.hours = v;
+      document.querySelectorAll('input[data-hours="' + i + '"]').forEach(function (e) { if (e !== inp) e.value = v; });
+      update();
+    }, 'w4');
+    var inp = w.querySelector('input');
+    inp.setAttribute('data-hours', i);
+    return w;
+  }
+
+  // 結果の前の「家の家電」: 品目名・使用時間（W × 時間の品目だけ）・1 か月の電気代・消すボタン（SCREEN.md 1.1 の必須の入力）
+  function renderQuick() {
+    var box = $('quick');
+    box.textContent = '';
+    if (!state.items.length) {
+      var p = document.createElement('p'); p.className = 'small'; p.textContent = '家電がありません。下の「品目を足す・数字を直す」の品目を押して足してください。';
+      box.appendChild(p);
+    }
+    state.items.forEach(function (it, i) {
+      var row = document.createElement('div');
+      row.className = 'qrow';
+      var name = document.createElement('span'); name.className = 'qname'; name.textContent = it.name;
+      row.appendChild(name);
+      var ctl = document.createElement('span'); ctl.className = 'qctl';
+      if (it.method === 'annual') {
+        var a = document.createElement('span'); a.className = 'qannual'; a.textContent = (it.annualKwh === '' ? '—' : it.annualKwh) + ' kWh/年';
+        ctl.appendChild(a);
+      } else {
+        ctl.appendChild(hoursField(it, i));
+      }
+      var cost = document.createElement('span'); cost.className = 'item-cost'; cost.id = 'qcost-' + i;
+      var del = document.createElement('button');
+      del.type = 'button'; del.className = 'icon-btn'; del.textContent = '×';
+      del.setAttribute('aria-label', it.name + 'を消す');
+      del.addEventListener('click', function () { state.items.splice(i, 1); renderItems(); update(); });
+      ctl.appendChild(cost); ctl.appendChild(del); row.appendChild(ctl);
+      box.appendChild(row);
+    });
+  }
+
   function renderItems() {
+    renderQuick();
     var box = $('items');
     box.textContent = '';
     if (!state.items.length) {
@@ -157,7 +200,7 @@
       var name = document.createElement('input');
       name.type = 'text'; name.value = it.name; name.maxLength = 30; name.className = 'item-name';
       name.setAttribute('aria-label', (i + 1) + ' 行目の品目名');
-      name.addEventListener('input', function () { it.name = name.value; update(); });
+      name.addEventListener('input', function () { it.name = name.value; renderQuick(); update(); });
       var cost = document.createElement('span'); cost.className = 'item-cost'; cost.id = 'cost-' + i;
       var del = document.createElement('button');
       del.type = 'button'; del.className = 'icon-btn'; del.textContent = '×';
@@ -177,10 +220,10 @@
       body.appendChild(sel);
       var lab = it.name;
       if (it.method === 'annual') {
-        body.appendChild(field('kWh/年', it.annualKwh, { min: 0, step: 1, inputmode: 'decimal', 'aria-label': lab + 'の年間消費電力量（kWh/年）' }, function (v) { it.annualKwh = v; update(); }, 'w6'));
+        body.appendChild(field('kWh/年', it.annualKwh, { min: 0, step: 1, inputmode: 'decimal', 'aria-label': lab + 'の年間消費電力量（kWh/年）' }, function (v) { it.annualKwh = v; renderQuick(); update(); }, 'w6'));
       } else {
         body.appendChild(field('W', it.watt, { min: 0, step: 1, inputmode: 'decimal', 'aria-label': lab + 'の消費電力（W）' }, function (v) { it.watt = v; update(); }, 'w5'));
-        body.appendChild(field('時間/日', it.hours, { min: 0, max: 24, step: 0.25, inputmode: 'decimal', 'aria-label': lab + 'の 1 日の使用時間' }, function (v) { it.hours = v; update(); }, 'w4'));
+        body.appendChild(hoursField(it, i));
         body.appendChild(field('日/月', it.days, { min: 0, max: 31, step: 1, inputmode: 'numeric', 'aria-label': lab + 'の 1 か月の使用日数' }, function (v) { it.days = v; update(); }, 'w4'));
         body.appendChild(field('待機 W', it.standbyW, { min: 0, step: 0.1, inputmode: 'decimal', 'aria-label': lab + 'の待機電力（W）' }, function (v) { it.standbyW = v; update(); }, 'w4'));
       }
@@ -205,8 +248,8 @@
     $('k-year').textContent = yen(sum.total.yenYear);
     $('k-kwh').textContent = kwh(sum.total.kwhMonth);
     sum.rows.forEach(function (r) {
-      var el = $('cost-' + r.index);
-      if (el) el.textContent = missingValue(state.items[r.index]) ? '値を入れてください' : '月 ' + yen(r.yenMonth);
+      var t = missingValue(state.items[r.index]) ? '値を入れてください' : '月 ' + yen(r.yenMonth);
+      ['cost-', 'qcost-'].forEach(function (pre) { var el = $(pre + r.index); if (el) el.textContent = t; });
     });
     var missing = state.items.filter(missingValue).map(function (it) { return it.name; });
     $('warnings').hidden = !missing.length;
@@ -352,6 +395,31 @@
     }, function () { $('share-msg').textContent = 'ファイルを読み取れませんでした。'; });
   });
 
+  // --- 上端の固定バーと「くわしく入れる」の状態表示（screen.js。yorozu-plans の SCREEN.md 1.1） ---
+  // 読み込み時から結果が出ているので、スクロールか入力をするまではバーを出さない（CLS を出さない）
+  var bar = window.YorozuScreen.fixedBar({ bar: 'fixbar', watch: 'result-main', jump: 'result-card', text: 'fixbar-text' });
+  var barArmed = false, barText = '';
+  function armBar() {
+    if (barArmed) return;
+    barArmed = true;
+    window.removeEventListener('scroll', armBar);
+    document.removeEventListener('input', armBar);
+    document.removeEventListener('change', armBar);
+    bar.set(barText);
+  }
+  window.addEventListener('scroll', armBar, { passive: true });
+  document.addEventListener('input', armBar);
+  document.addEventListener('change', armBar);
+
+  function updateSummaries() {
+    var missing = state.items.filter(missingValue).length;
+    window.YorozuScreen.detailsSummary({
+      'opt-items': state.items.length + ' 品目' + (missing ? '（' + missing + ' 品目は値が空）' : ''),
+      'opt-price': price() + ' 円/kWh',
+      'opt-save': $(state.tab === 'rep' ? 'tab-rep' : 'tab-usage').textContent,
+    });
+  }
+
   // --- 全体の更新 ---
   function update() {
     if (!fromShare) store.set('draft', state);
@@ -360,6 +428,10 @@
     renderTips();
     renderRep();
     syncShare();
+    updateSummaries();
+    // 固定バーは「1 か月」の電気代（結果の見出しと同じ語）
+    barText = state.items.length ? '1 か月 ' + $('k-month').textContent : '';
+    if (barArmed) bar.set(barText);
   }
 
   // 共有リンクから開いたときは、保存中の下書きを上書きしない（操作したら下書きとして保存し直す）
