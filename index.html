@@ -145,6 +145,9 @@
     <section class="card">
       <div class="btn-row">
         <button type="button" class="btn btn-sub" id="share">この家電リストを開くリンクをコピー</button>
+        <button type="button" class="btn btn-sub" id="backup-export">ファイルに書き出す</button>
+        <button type="button" class="btn btn-sub" id="backup-import">ファイルから読み込む</button>
+        <input type="file" id="backup-file" accept=".json,application/json" hidden>
       </div>
       <p id="share-msg" class="small" aria-live="polite"></p>
       <p class="small">試算は目安です。実際の電気代は、機種・使い方・契約（料金プランや燃料費調整額など）によって変わります。<a href="./guide.html">使い方・電気代の計算方法・よくある質問</a></p>
