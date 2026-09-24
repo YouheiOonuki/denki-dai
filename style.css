@@ -189,3 +189,8 @@ h3.sub { font-size: 0.92rem; margin: 0.8rem 0 0.4rem; }
 .tbl th, .tbl td { border-bottom: 1px solid var(--border); padding: 0.35rem 0.45rem; text-align: left; vertical-align: top; }
 .tbl thead th { color: var(--muted); }
 .tbl td:last-child { white-space: nowrap; }
+
+/* 使い方ページの折りたたみ（WRITING.md の基準で、補足・一覧はここに入れる） */
+.content details { margin: 0.4rem 0; }
+.content summary { cursor: pointer; color: var(--accent); font-size: 0.88rem; }
+.content details[open] summary { margin-bottom: 0.3rem; }
