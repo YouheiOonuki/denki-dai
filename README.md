@@ -56,7 +56,7 @@ yorozu-craft のツールの1つです（共通ルールは [youheioonuki.github
 | `constants.js` | 単価・家電のプリセット・節約の効果・出典と確認日 |
 | `main.js` | 画面の制御・ランキング・節約タブ・保存・共有リンク |
 | `screen.js` | 画面の部品（上端の固定バー・折りたたみの状態表示。yorozu-template と同じ） |
-| `style.css` | 見た目（和紙風の配色、ダークモード対応） |
+| `style.css` | 見た目（和紙風の配色、ダークモード対応）。先頭の `yorozu-common:begin`〜`end` はサイト共通の部品とトークン（手で直さない。正本は youheioonuki.github.io の `tools/common/yorozu-common.css`、`tools/sync-common.mjs` で配る） |
 | `404.html` | ツール配下の存在しない URL で出るページ（サイト共通のもの） |
 | `favicon.svg` / `apple-touch-icon.png` / `og-image.png` | アイコン / ホーム画面用アイコン / SNS 共有用画像（1200×630） |
 | `sitemap.xml` | サイトマップ（robots.txt はドメイン直下で管理） |
