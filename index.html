@@ -18,8 +18,8 @@
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="theme-color" content="#8b4513" media="(prefers-color-scheme: light)">
-  <meta name="theme-color" content="#1c1814" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#eef0f2" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#15191d" media="(prefers-color-scheme: dark)">
 
   <script type="application/ld+json">
   {
@@ -48,7 +48,7 @@
 <body>
 
   <!-- 上端の固定バー（SCREEN.md 1.1・D59）。結果が画面の外にあるときだけ screen.js が出す。読み込み時は hidden -->
-  <div class="fixbar" id="fixbar" role="status" hidden>
+  <div class="fixed-bar" id="fixbar" role="status" hidden>
     <a href="#result-card"><span id="fixbar-text"></span> ▸ 結果へ</a>
   </div>
 
@@ -71,11 +71,11 @@
     <!-- 2. 結果 -->
     <section class="card result result-card" id="result-card" tabindex="-1" aria-labelledby="h-result" aria-live="polite">
       <h2 id="h-result">電気代の目安</h2>
-      <div id="warnings" class="msg msg-warn" hidden></div>
+      <div id="warnings" class="notice" hidden></div>
       <dl class="kpi" id="result-main">
-        <div><dt>1 か月</dt><dd id="k-month">—</dd></div>
-        <div><dt>1 年</dt><dd id="k-year">—</dd></div>
-        <div><dt>電力量（1 か月）</dt><dd id="k-kwh">—</dd></div>
+        <div><dt>1 か月</dt><dd class="result-num" id="k-month">—</dd></div>
+        <div><dt>1 年</dt><dd class="result-num" id="k-year">—</dd></div>
+        <div><dt>電力量（1 か月）</dt><dd class="result-num" id="k-kwh">—</dd></div>
       </dl>
       <h3 class="sub">電気代を多く使っている家電</h3>
       <div id="ranking" class="ranking"></div>
@@ -98,7 +98,7 @@
           <p class="hint">検針票の「請求額 ÷ 使用量（kWh）」で、ご自宅の単価のだいたいの値が出せます。既定は家電のカタログで使われる目安単価です。</p>
           <div class="with-unit">
             <input type="number" id="unit-price" inputmode="decimal" min="1" max="200" step="0.1">
-            <button type="button" class="btn btn-sub" id="reset-price">目安単価に戻す</button>
+            <button type="button" class="btn" id="reset-price">目安単価に戻す</button>
           </div>
         </div>
       </details>
@@ -144,8 +144,8 @@
             <div class="field"><label for="rep-price">買い替える製品の価格（円）</label><input type="number" id="rep-price" inputmode="numeric" min="0" step="1000"></div>
           </div>
           <dl class="kpi" id="rep-result">
-            <div><dt>1 年の電気代の差</dt><dd id="r-saving">—</dd></div>
-            <div><dt>元が取れるまで</dt><dd id="r-years">—</dd></div>
+            <div><dt>1 年の電気代の差</dt><dd class="result-num" id="r-saving">—</dd></div>
+            <div><dt>元が取れるまで</dt><dd class="result-num" id="r-years">—</dd></div>
           </dl>
           <p class="small" id="r-detail"></p>
           <h3 class="sub">買い替えの目安（10 年前の製品との比較）</h3>
@@ -158,10 +158,10 @@
     <details class="card opt no-print" id="opt-share">
       <summary>入力の保存・書き出し</summary>
       <div class="btn-row">
-        <button type="button" class="btn btn-sub" id="share">この家電リストを開くリンクをコピー</button>
-        <button type="button" class="btn btn-sub" id="backup-export">ファイルに書き出す</button>
-        <button type="button" class="btn btn-sub" id="backup-import">ファイルから読み込む</button>
-        <button type="button" class="btn btn-sub" data-reset-storage="denki-dai_">保存した内容をすべて消す（初期状態に戻す）</button>
+        <button type="button" class="btn" id="share">この家電リストを開くリンクをコピー</button>
+        <button type="button" class="btn" id="backup-export">ファイルに書き出す</button>
+        <button type="button" class="btn" id="backup-import">ファイルから読み込む</button>
+        <button type="button" class="btn" data-reset-storage="denki-dai_">保存した内容をすべて消す（初期状態に戻す）</button>
         <input type="file" id="backup-file" accept=".json,application/json" hidden>
       </div>
       <p id="share-msg" class="small" aria-live="polite"></p>
