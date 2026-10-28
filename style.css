@@ -109,9 +109,6 @@ html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
 .faq dt { font-weight: 700; margin-top: var(--sp-4); }
 .faq dt::before { content: 'Q. '; color: var(--accent); }
 .faq dd { color: var(--muted); padding: var(--sp-1) 0 var(--sp-2) 1.2rem; border-bottom: 1px solid var(--border); }
-.info-list { display: grid; grid-template-columns: max-content 1fr; gap: var(--sp-2) var(--sp-6); }
-.info-list dt { font-weight: 700; }
-.info-list dd { color: var(--muted); }
 .small { font-size: var(--fs-s); color: var(--muted); margin-top: var(--sp-2); }
 .small a, .center a, .content p a { display: inline-flex; align-items: center; min-height: var(--tap); }
 .center { text-align: center; }
@@ -237,3 +234,6 @@ details.card.opt[open] > summary { border-bottom: 1px solid var(--border); margi
   main details::details-content { content-visibility: visible; display: block; }
   main details > summary::before { content: none; }
 }
+
+/* 1 行に 1 つのリンク（使い方への行・案内のカード・出典の一覧）も押せる高さに（DESIGN の 44px。K192 段 3 の 4 の検収） */
+:where(html:not([data-skin="base"])) :where(p, li) > a:only-child { display: inline-flex; align-items: center; min-height: var(--tap); }
