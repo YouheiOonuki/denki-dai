@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
   <!-- 家電の電気代・節約額シミュレーター: コンセントのプラグと稲妻 -->
-  <rect x="2" y="2" width="60" height="60" rx="12" fill="#faf6ee"/>
-  <path d="M35 8 L18 36 H30 L26 56 L46 26 H34 Z" fill="#d9a520" stroke="#8b4513" stroke-width="3.5" stroke-linejoin="round"/>
+  <rect x="2" y="2" width="60" height="60" rx="12" fill="#eef0f2"/>
+  <path d="M35 8 L18 36 H30 L26 56 L46 26 H34 Z" fill="#d9a520" stroke="#0e5a6b" stroke-width="3.5" stroke-linejoin="round"/>
 </svg>
