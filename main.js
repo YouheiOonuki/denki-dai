@@ -432,6 +432,7 @@
     // 固定バーは「1 か月」の電気代（結果の見出しと同じ語）
     barText = state.items.length ? '1 か月 ' + $('k-month').textContent : '';
     if (barArmed) bar.set(barText);
+    window.yzUsed?.();
   }
 
   // 共有リンクから開いたときは、保存中の下書きを上書きしない（操作したら下書きとして保存し直す）
