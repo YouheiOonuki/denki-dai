@@ -63,7 +63,7 @@
   };
 
   var CONSTANTS = {
-    CHECKED: '2026-09-23',   // 下の出典の本文を取得して確かめた日
+    CHECKED: '2026-11-12',   // 下の出典の本文を取得して確かめた日
     STALE_MONTHS: 12,        // 確認日からこの月数がたったら画面に注意を出す
     SOURCES: SOURCES,
 
@@ -94,18 +94,17 @@
     // 品目（kind）ごとの、使い方の見直しによる年間の節約電力量（kWh/年）。値と条件は省エネポータルの本文のとおり
     TIPS: {
       aircon: [
-        { label: '冷房の設定温度を 1℃上げる（27℃→28℃）', kwhYear: 30.24, condition: '外気温度 31℃、2.2kW、1 日 9 時間', source: 'howto_air' },
-        { label: '暖房の設定温度を 1℃下げる（21℃→20℃）', kwhYear: 53.08, condition: '外気温度 6℃、2.2kW、1 日 9 時間', source: 'howto_air' },
-        { label: '冷房を 1 日 1 時間短くする', kwhYear: 18.78, condition: '設定温度 28℃', source: 'howto_air' },
-        { label: '暖房を 1 日 1 時間短くする', kwhYear: 40.73, condition: '設定温度 20℃', source: 'howto_air' },
-        { label: 'フィルターを月に 1〜2 回掃除する', kwhYear: 31.95, condition: '目詰まりしている 2.2kW のエアコンとの比較', source: 'howto_air' },
+        { label: '冷房の設定温度を 1℃上げる', kwhYear: 8.80, condition: '2.5kW のエアコン。東京をモデルとした木造南向き住宅を想定（JIS C 9612:2013）', source: 'howto_air' },
+        { label: '暖房の設定温度を 1℃下げる', kwhYear: 15.80, condition: '2.5kW のエアコン。東京をモデルとした木造南向き住宅を想定（JIS C 9612:2013）', source: 'howto_air' },
+        { label: '冷房を 1 日 1 時間短くする', kwhYear: 25.38, condition: '2.5kW のエアコン。東京をモデルとした木造南向き住宅を想定（JIS C 9612:2013）', source: 'howto_air' },
+        { label: '暖房を 1 日 1 時間短くする', kwhYear: 35.68, condition: '2.5kW のエアコン。東京をモデルとした木造南向き住宅を想定（JIS C 9612:2013）', source: 'howto_air' },
+        { label: 'フィルターを月に 1〜2 回掃除する', kwhYear: 37.90, condition: '目詰まりしている 2.5kW のエアコンとの比較。目詰まりによる風量の低下を 20％と想定', source: 'howto_air' },
       ],
       fridge: [
-        { label: '設定温度を「強」から「中」にする', kwhYear: 61.72, condition: '周囲温度 22℃', source: 'howto_kitchen' },
+        { label: '温度設定を一段階下げる（中→弱）', kwhYear: 63.45, condition: '温度設定を「中」から「弱」にした場合の比較', source: 'howto_kitchen' },
         { label: '壁から適切な間隔をあけて置く', kwhYear: 45.08, condition: '上と両側が壁に接している場合と、片側が接している場合の比較', source: 'howto_kitchen' },
-        { label: 'ものを詰め込みすぎない', kwhYear: 43.84, condition: '詰め込んだ場合と、半分にした場合の比較', source: 'howto_kitchen' },
-        { label: '無駄な開け閉めをしない', kwhYear: 10.40, condition: '旧 JIS の開閉回数と、その 2 倍の比較', source: 'howto_kitchen' },
-        { label: '開けている時間を短くする', kwhYear: 6.10, condition: '20 秒と 10 秒の比較', source: 'howto_kitchen' },
+        { label: '無駄な開け閉めを減らす', kwhYear: 10.90, condition: '1 日の開閉回数を半分にした場合（冷蔵室 30 回→15 回、冷凍室 8 回→4 回）。1 回の開閉時間は 10 秒と想定', source: 'howto_kitchen' },
+        { label: '開けている時間を短くする', kwhYear: 24.00, condition: '1 回の開放時間が 20 秒の場合と 10 秒の場合の比較。1 日の開閉回数は冷蔵室 30 回、冷凍室 8 回と想定', source: 'howto_kitchen' },
       ],
       tv: [
         { label: '画面の明るさ（輝度）を 1 割下げる', kwhYear: 18.73, condition: '液晶 50V 型', source: 'howto_ent' },
@@ -120,9 +119,9 @@
         { label: '長く使わないときはプラグを抜く', kwhYear: 107.45, condition: '2.2L を沸かして 1.2L 使い、6 時間保温する場合と、保温せず再沸騰する場合の比較', source: 'howto_kitchen' },
       ],
       toilet: [
-        { label: '使わないときはフタを閉める', kwhYear: 34.90, condition: '貯湯式', source: 'howto_bath' },
-        { label: '便座の温度を一段階下げる（中→弱）', kwhYear: 26.40, condition: '貯湯式、冷房期間はオフ', source: 'howto_bath' },
-        { label: '洗浄水の温度を一段階下げる（中→弱）', kwhYear: 13.80, condition: '貯湯式', source: 'howto_bath' },
+        { label: '使わないときはフタを閉める', kwhYear: 29.23, condition: '貯湯式。フタを閉めた場合と、開けっぱなしの場合の比較', source: 'howto_bath' },
+        { label: '便座の温度を一段階下げる（中→弱）', kwhYear: 20.01, condition: '貯湯式、冷房期間はオフ', source: 'howto_bath' },
+        { label: '洗浄水の温度を一段階下げる（中→弱）', kwhYear: 8.15, condition: '貯湯式', source: 'howto_bath' },
       ],
     },
 
