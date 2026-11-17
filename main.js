@@ -540,6 +540,8 @@
     $('asof-price').textContent = K.UNIT_PRICE.value + ' 円/kWh・' + K.SOURCES.eftc.publisher.replace('公益社団法人 ', '');
     var hc = K.HOUSEHOLD.checked.split('-');
     $('household-src').textContent = '出典: ' + K.SOURCES.kakei2p.publisher + ' 家計調査（' + K.HOUSEHOLD.year + ' 年平均）・確認日 ' + hc[0] + '年' + (+hc[1]) + '月' + (+hc[2]) + '日';
+    var M = K.HOUSEHOLD_MONTHLY, mc = M.checked.split('-');
+    $('monthly-src').textContent = '出典: ' + K.SOURCES[M.source].publisher + ' 家計調査（月次・' + Calc.monthlyPeriod(M.months) + '）・確認日 ' + mc[0] + '年' + (+mc[1]) + '月' + (+mc[2]) + '日';
     var d = K.CHECKED.split('-');
     var months = (new Date().getFullYear() - d[0]) * 12 + (new Date().getMonth() + 1 - d[1]);
     if (months >= K.STALE_MONTHS) {

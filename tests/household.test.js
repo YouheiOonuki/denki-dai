@@ -61,8 +61,7 @@ test('guide の根拠の行は値のファイルと同じ額・年・確認日�
 test('画面: 図の下の 1 文と出典の置き場がある。額を HTML に書かない', () => {
   const html = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
   assert.ok(html.includes('家計調査の額は世帯の電気代の全部です。この画面の額は、入れた家電の分だけです。'));
-  assert.match(html, /<div id="household" class="ranking household"><\/div>/);
-  assert.match(html, /<span id="household-src"><\/span>/);
+  assert.match(html, /<div id="household" class="ranking household"><\/div>\n\s*<p class="small" id="household-src"><\/p>/);
   for (const r of H.rows) assert.ok(!html.includes(r.yen.toLocaleString('ja-JP')), `${r.yen} が index.html に直書きされている`);
 });
 

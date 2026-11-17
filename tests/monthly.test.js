@@ -111,3 +111,35 @@ test('使い方: 文と更新履歴が 1 行ずつ', () => {
   assert.equal(g.split('図の上の人数を押すと、その人数の世帯の月ごとの平均に切り替わります。').length - 1, 1);
   assert.equal(g.split('月ごとの電気代の平均の図を足しました').length - 1, 1);
 });
+
+// Q-412: 月ごとの図の出典は月次の表。期間は値のファイルの最初と最後の月から作る（数を手で書かない）
+test('出典の期間: 値のファイルの最初と最後の月', () => {
+  assert.equal(C.monthlyPeriod(M.months), '2025年10月〜2026年9月');
+  const first = M.months[0].split('-'), last = M.months[M.months.length - 1].split('-');
+  assert.equal(C.monthlyPeriod(M.months), `${first[0]}年${+first[1]}月〜${last[0]}年${+last[1]}月`);
+  // 値のファイルの月が替われば、期間も替わる
+  assert.equal(C.monthlyPeriod(['2026-01', '2026-12']), '2026年1月〜2026年12月');
+  assert.equal(C.monthlyPeriod(['2025-11', '2026-10']), '2025年11月〜2026年10月');
+});
+
+test('出典の文: 月次の出典は月ごとの図の下、年平均の出典は人数ごとの図の下', () => {
+  const html = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
+  assert.match(html, /<div id="monthly" class="ranking household monthly"><\/div>\n\s*<p class="small" id="monthly-src"><\/p>/);
+  assert.match(html, /<div id="household" class="ranking household"><\/div>\n\s*<p class="small" id="household-src"><\/p>/);
+  assert.ok(html.indexOf('id="household-src"') < html.indexOf('id="monthly-pick"'));
+  const main = fs.readFileSync(path.join(ROOT, 'main.js'), 'utf8');
+  assert.ok(main.includes("' 家計調査（月次・' + Calc.monthlyPeriod(M.months) + '）・確認日 '"));
+  assert.ok(!/年\d+月〜/.test(main) && !main.includes('2025年10月'), '期間を main.js に手で書かない');
+  // main.js の組み立てと同じ式で、今の値から出る字
+  const mc = M.checked.split('-');
+  const text = '出典: ' + K.SOURCES[M.source].publisher + ' 家計調査（月次・' + C.monthlyPeriod(M.months) + '）・確認日 ' + mc[0] + '年' + (+mc[1]) + '月' + (+mc[2]) + '日';
+  assert.equal(text, '出典: 総務省統計局 家計調査（月次・2025年10月〜2026年9月）・確認日 2026年11月18日');
+});
+
+test('使い方: 支払った月の 1 文と、Q-412 の更新履歴が 1 行ずつ。画面には足さない', () => {
+  const g = fs.readFileSync(path.join(ROOT, 'guide.html'), 'utf8');
+  const s = '月ごとの図の月は、電気代を支払った月です（家計調査の数え方）。';
+  assert.equal(g.split(s).length - 1, 1);
+  assert.equal(g.split('月ごとの図に、月次の出典を足しました').length - 1, 1);
+  assert.ok(!fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8').includes('支払った月'));
+});
