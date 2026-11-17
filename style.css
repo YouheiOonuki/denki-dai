@@ -160,6 +160,12 @@ h3.sub { margin: var(--sp-3) 0 var(--sp-2); }
 .household .bar { fill: var(--muted); }
 .household .you-line { stroke: var(--accent); stroke-width: 4; }
 .household .you-label { fill: var(--accent); font-size: 24px; font-weight: 700; }
+.monthly .mark { fill: var(--text); }
+.monthly .bar.current { fill: var(--text); }
+.monthly .bar-label.current { font-weight: 700; }
+.monthly-pick { margin: 0 0 var(--sp-2); }
+.monthly-pick button { min-width: var(--tap); }
+.monthly-pick button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
 
 .tabs { display: flex; gap: var(--sp-1); border-bottom: 1px solid var(--border); margin-bottom: var(--sp-3); }
 .tabs button { border: 0; border-bottom: 3px solid transparent; border-radius: 0; background: none; color: var(--muted); padding: 0 var(--sp-3); }
