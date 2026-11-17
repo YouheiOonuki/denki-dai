@@ -256,6 +256,67 @@
     $('warnings').textContent = missing.length ? missing.join('・') + ' の消費電力（W）か年間消費電力量（kWh/年）が空のため、0 円として数えています。本体の表示やカタログの値を入れてください。' : '';
     renderRanking(sum);
     renderHousehold(sum);
+    lastSum = sum;
+    renderMonthly();
+  }
+
+  // 月ごとの平均（家計調査の月次）の縦棒と、この画面の 1 か月の額の横の線。系列は図の上で選ぶ（保存しない・計算に入れない）
+  // 月は聞かない（端末の今日の月）。1 人の系列は無い（単身世帯の月次の表が無い）
+  var lastSum = null;
+  var monthlyLabel = K.HOUSEHOLD_MONTHLY.series[0].label;
+  (function () {
+    var pick = $('monthly-pick');
+    K.HOUSEHOLD_MONTHLY.series.forEach(function (s) {
+      var b = document.createElement('button');
+      b.type = 'button'; b.textContent = s.label; b.dataset.label = s.label;
+      b.addEventListener('click', function () { monthlyLabel = s.label; renderMonthly(); });
+      pick.appendChild(b);
+    });
+  })();
+  function renderMonthly() {
+    if (!lastSum) return;
+    [].forEach.call($('monthly-pick').children, function (b) { b.setAttribute('aria-pressed', String(b.dataset.label === monthlyLabel)); });
+    var box = $('monthly');
+    box.textContent = '';
+    var ch = Calc.monthlyChart(K.HOUSEHOLD_MONTHLY, monthlyLabel, new Date().getMonth() + 1, lastSum.total.yenMonth, state.items.length > 0);
+    var W = 640, L = 8, R = 8, top = 60, plotH = 260, bottom = 40, H = top + plotH + bottom;
+    var colW = (W - L - R) / 12, barW = colW * 0.62;
+    var svg = document.createElementNS(SVGNS, 'svg');
+    svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+    svg.setAttribute('role', 'img');
+    svg.setAttribute('aria-label', '月ごとの 1 か月の電気代の平均（家計調査、' + ch.label + '）：' +
+      ch.bars.map(function (b) { return b.month + '月 ' + (b.yen === null ? '—' : yen(b.yen)); }).join('、') + (ch.line ? '。この画面の 1 か月 ' + yen(ch.line.yen) : ''));
+    function el(name, attrs, text) {
+      var e = document.createElementNS(SVGNS, name);
+      Object.keys(attrs).forEach(function (k) { e.setAttribute(k, attrs[k]); });
+      if (text !== undefined) e.textContent = text;
+      svg.appendChild(e); return e;
+    }
+    var base = top + plotH;
+    ch.bars.forEach(function (b, i) {
+      var cx = L + colW * i + colW / 2;
+      if (b.yen !== null) {
+        var h = Math.max(2, plotH * b.frac);
+        el('rect', { x: cx - barW / 2, y: base - h, width: barW, height: h, rx: 3, class: b.current ? 'bar current' : 'bar', 'data-month': b.month });
+        if (b.current) {
+          // 今日の月の印: 棒の上の下向きの三角と額
+          var ty = base - h - 8;
+          el('path', { d: 'M' + (cx - 11) + ' ' + (ty - 14) + ' L' + (cx + 11) + ' ' + (ty - 14) + ' L' + cx + ' ' + ty + ' Z', class: 'mark', 'data-month': b.month });
+          el('text', { x: Math.min(Math.max(cx, 70), W - 70), y: ty - 22, 'text-anchor': 'middle', class: 'bar-value' }, yen(b.yen));
+        }
+      } else if (b.current) {
+        el('path', { d: 'M' + (cx - 11) + ' ' + (base - 22) + ' L' + (cx + 11) + ' ' + (base - 22) + ' L' + cx + ' ' + (base - 8) + ' Z', class: 'mark', 'data-month': b.month });
+      }
+      el('text', { x: cx, y: base + 30, 'text-anchor': 'middle', class: b.current ? 'bar-label current' : 'bar-label' }, String(b.month));
+    });
+    if (ch.line) {
+      var y = base - plotH * ch.line.frac;
+      el('line', { x1: L, y1: y, x2: W - R, y2: y, class: 'you-line', 'data-frac': ch.line.frac });
+      // 額の字は棒に重ねず、図の左上に線の見本と並べる
+      el('line', { x1: L, y1: 18, x2: L + 36, y2: 18, class: 'you-line' });
+      el('text', { x: L + 46, y: 26, class: 'you-label' }, 'この画面 ' + yen(ch.line.yen));
+    }
+    box.appendChild(svg);
   }
 
   // 世帯の人数ごとの平均（家計調査）の横棒と、この画面の 1 か月の額の縦の線。世帯の人数は聞かない

@@ -154,8 +154,36 @@
     return { axisMax: axisMax, bars: bars, line: line };
   }
 
+  /**
+   * 月ごとの平均の図（縦棒、1〜12 月）と、この画面の 1 か月の額の横の線の位置
+   * data = constants.js の HOUSEHOLD_MONTHLY。label は系列の名前（無い名前なら先頭の系列）
+   * month = 端末の今日の月（1〜12）。その月の棒に current を立てる
+   * 軸の上端は全系列のいちばん高い額を 5,000 円単位で切り上げた額（系列を替えても軸は動かない）
+   * 値の無い月は yen: null・frac: 0。線は householdChart と同じ決め（家電 0 件なら無し、軸の外は上端に止める）
+   */
+  function monthlyChart(data, label, month, monthYen, hasItems) {
+    var s = data.series.filter(function (x) { return x.label === label; })[0] || data.series[0];
+    var max = data.series.reduce(function (m, x) {
+      return x.yen.reduce(function (mm, v) { return typeof v === 'number' && v > mm ? v : mm; }, m);
+    }, 0);
+    var axisMax = Math.max(AXIS_STEP, Math.ceil(max / AXIS_STEP) * AXIS_STEP);
+    var bars = [];
+    for (var m = 1; m <= 12; m++) {
+      var i = -1;
+      data.months.forEach(function (ym, k) { if (+ym.split('-')[1] === m) i = k; });
+      var v = i >= 0 && typeof s.yen[i] === 'number' && isFinite(s.yen[i]) ? s.yen[i] : null;
+      bars.push({ month: m, ym: i >= 0 ? data.months[i] : null, yen: v, frac: v === null ? 0 : v / axisMax, current: m === month });
+    }
+    var line = null;
+    if (hasItems) {
+      var y = typeof monthYen === 'number' && isFinite(monthYen) && monthYen > 0 ? monthYen : 0;
+      line = { yen: y, frac: Math.min(y, axisMax) / axisMax, clamped: y > axisMax };
+    }
+    return { label: s.label, axisMax: axisMax, bars: bars, line: line };
+  }
+
   var Calc = {
-    householdChart: householdChart,
+    householdChart: householdChart, monthlyChart: monthlyChart,
     DAYS_PER_MONTH: DAYS_PER_MONTH, monthlyKwh: monthlyKwh, cost: cost, summarize: summarize,
     paybackYears: paybackYears, replacement: replacement, usageChanges: usageChanges,
     backupFileName: backupFileName, buildBackup: buildBackup, parseBackup: parseBackup,
