@@ -135,7 +135,27 @@
     return { ok: true, data: data };
   }
 
+  /**
+   * 世帯の人数ごとの平均の図（横棒）と、この画面の 1 か月の額の縦の線の位置
+   * rows = [{ label, yen }]（constants.js の HOUSEHOLD.rows）。軸の右端は棒のいちばん長いものを 5,000 円単位で切り上げた額
+   * 線は家電が 1 件以上あるときだけ（hasItems）。額が軸の外なら右端に止め、clamped を立てる。0 円なら左端
+   * 返り値の frac は 0〜1（軸の右端 = 1）
+   */
+  var AXIS_STEP = 5000;
+  function householdChart(rows, monthYen, hasItems) {
+    var max = rows.reduce(function (m, r) { return Math.max(m, r.yen); }, 0);
+    var axisMax = Math.max(AXIS_STEP, Math.ceil(max / AXIS_STEP) * AXIS_STEP);
+    var bars = rows.map(function (r) { return { label: r.label, yen: r.yen, frac: r.yen / axisMax }; });
+    var line = null;
+    if (hasItems) {
+      var y = typeof monthYen === 'number' && isFinite(monthYen) && monthYen > 0 ? monthYen : 0;
+      line = { yen: y, frac: Math.min(y, axisMax) / axisMax, clamped: y > axisMax };
+    }
+    return { axisMax: axisMax, bars: bars, line: line };
+  }
+
   var Calc = {
+    householdChart: householdChart,
     DAYS_PER_MONTH: DAYS_PER_MONTH, monthlyKwh: monthlyKwh, cost: cost, summarize: summarize,
     paybackYears: paybackYears, replacement: replacement, usageChanges: usageChanges,
     backupFileName: backupFileName, buildBackup: buildBackup, parseBackup: parseBackup,

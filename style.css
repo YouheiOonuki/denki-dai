@@ -157,6 +157,9 @@ h3.sub { margin: var(--sp-3) 0 var(--sp-2); }
 .ranking .bar { fill: var(--accent); }
 .ranking .bar-label { fill: var(--text); font-size: 26px; }
 .ranking .bar-value { fill: var(--muted); font-size: 25px; }
+.household .bar { fill: var(--muted); }
+.household .you-line { stroke: var(--accent); stroke-width: 4; }
+.household .you-label { fill: var(--accent); font-size: 24px; font-weight: 700; }
 
 .tabs { display: flex; gap: var(--sp-1); border-bottom: 1px solid var(--border); margin-bottom: var(--sp-3); }
 .tabs button { border: 0; border-bottom: 3px solid transparent; border-radius: 0; background: none; color: var(--muted); padding: 0 var(--sp-3); }

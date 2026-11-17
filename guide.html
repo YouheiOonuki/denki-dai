@@ -144,6 +144,7 @@
     <article class="card content" id="basis">
       <h2>根拠と確認日</h2>
       <p>根拠: 全国家庭電気製品公正取引協議会の目安単価、資源エネルギー庁の省エネポータルサイト・省エネ性能カタログ 2025 年版。最終確認日 <time datetime="" id="checked"></time>。</p>
+      <p id="household-basis"></p>
       <details>
         <summary>出典の一覧</summary>
         <ul id="sources"></ul>
@@ -190,6 +191,7 @@
     <article class="card content" id="changelog">
       <h2>更新履歴</h2>
       <ul>
+        <li><time datetime="2026-11-17">2026年11月17日</time> 結果の下に、世帯の人数ごとの電気代の平均（家計調査）の図を足しました</li>
         <li><time datetime="2026-11-12">2026年11月12日</time> 節約の効果の値（エアコン・冷蔵庫・温水洗浄便座）を省エネポータルの今の値に合わせました</li>
         <li><time datetime="2026-09-24">2026年9月24日</time> 保存している内容をファイルに書き出し・読み込みできるようにしました</li>
         <li><time datetime="2026-09-23">2026年9月23日</time> 公開</li>
@@ -234,6 +236,10 @@
           tb.appendChild(tr);
         });
       });
+      var H = K.HOUSEHOLD, hc = H.checked.split('-');
+      document.getElementById('household-basis').textContent = '世帯の人数ごとの電気代: 総務省統計局 家計調査（' + H.year + ' 年平均、1 か月）: ' +
+        H.rows.map(function (r) { return r.label + ' ' + r.yen.toLocaleString('ja-JP') + ' 円'; }).join('・') +
+        '。1 人は単身世帯、2 人からは二人以上の世帯の表。確認日 ' + hc[0] + '年' + (+hc[1]) + '月' + (+hc[2]) + '日';
       var d = K.CHECKED.split('-'), t = document.getElementById('checked');
       t.dateTime = K.CHECKED; t.textContent = d[0] + '年' + (+d[1]) + '月' + (+d[2]) + '日';
     })();
