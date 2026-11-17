@@ -54,6 +54,18 @@
       url: 'https://seihinjyoho.go.jp/frontguide/pdf/catalog/2025/catalog2025.pdf',
       note: 'エアコンは冷房能力 2.2kW（6 畳）の一覧の平均値 678kWh（期間消費電力量）、冷蔵庫は間冷式・定格内容積 401〜450L の一覧の平均値 286kWh/年（平均 418L）。カタログの目安電気料金は 27 円/kWh（統一省エネラベルの単価）で計算されている',
     },
+    kakei2p: {
+      label: '家計調査 家計収支編 二人以上の世帯 詳細結果表 年次 2025年 第3-1表（世帯人員別）',
+      publisher: '総務省統計局',
+      url: 'https://www.e-stat.go.jp/dbview?sid=0002070009',
+      note: '1 世帯当たり 1 か月間の電気代（年平均）。e-Stat のデータベースの表示で、用途分類「電気代」・二人以上の世帯（2000年～）・全国を選んで 2 人〜6 人以上の列を読んだ',
+    },
+    kakei1p: {
+      label: '家計調査 家計収支編 単身世帯 詳細結果表 年次 2025年 第1表（用途分類）',
+      publisher: '総務省統計局',
+      url: 'https://www.e-stat.go.jp/dbview?sid=0003000797',
+      note: '1 世帯当たり 1 か月間の電気代（年平均）。e-Stat のデータベースの表示で、単身世帯・全国の「電気代」の列を読んだ',
+    },
     user: {
       label: 'お手持ちの製品の表示',
       publisher: '—',
@@ -66,6 +78,21 @@
     CHECKED: '2026-11-12',   // 下の出典の本文を取得して確かめた日
     STALE_MONTHS: 12,        // 確認日からこの月数がたったら画面に注意を出す
     SOURCES: SOURCES,
+
+    // 世帯の人数ごとの 1 か月の電気代（家計調査、年平均）。区切りは表のまま。1 人は単身世帯の表、2 人からは二人以上の世帯の表
+    // 家計調査の額は世帯の電気代の全部で、画面の額（入れた家電の分）とは数え方が違う
+    HOUSEHOLD: {
+      year: 2025,
+      checked: '2026-11-17',   // 下の 2 表を e-Stat で開いて読んだ日
+      rows: [
+        { label: '1 人', yen: 7337, source: 'kakei1p' },
+        { label: '2 人', yen: 12144, source: 'kakei2p' },
+        { label: '3 人', yen: 13915, source: 'kakei2p' },
+        { label: '4 人', yen: 13928, source: 'kakei2p' },
+        { label: '5 人', yen: 15665, source: 'kakei2p' },
+        { label: '6 人以上', yen: 17322, source: 'kakei2p' },
+      ],
+    },
 
     UNIT_PRICE: { value: 31, label: '新電力料金目安単価（税込）', source: 'eftc', url: SOURCES.eftc.url, revised: '2022-07-22' },
 

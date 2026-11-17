@@ -255,6 +255,40 @@
     $('warnings').hidden = !missing.length;
     $('warnings').textContent = missing.length ? missing.join('・') + ' の消費電力（W）か年間消費電力量（kWh/年）が空のため、0 円として数えています。本体の表示やカタログの値を入れてください。' : '';
     renderRanking(sum);
+    renderHousehold(sum);
+  }
+
+  // 世帯の人数ごとの平均（家計調査）の横棒と、この画面の 1 か月の額の縦の線。世帯の人数は聞かない
+  function renderHousehold(sum) {
+    var box = $('household');
+    box.textContent = '';
+    var ch = Calc.householdChart(K.HOUSEHOLD.rows, sum.total.yenMonth, state.items.length > 0);
+    var W = 640, L = 130, R = 140, top = ch.line ? 40 : 6, rowH = 46, H = top + ch.bars.length * rowH + 6;
+    var plot = W - L - R;
+    var svg = document.createElementNS(SVGNS, 'svg');
+    svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+    svg.setAttribute('role', 'img');
+    svg.setAttribute('aria-label', '世帯の人数ごとの 1 か月の電気代の平均（家計調査 ' + K.HOUSEHOLD.year + ' 年）：' +
+      ch.bars.map(function (b) { return b.label + ' ' + yen(b.yen); }).join('、') + (ch.line ? '。この画面の 1 か月 ' + yen(ch.line.yen) : ''));
+    function el(name, attrs, text) {
+      var e = document.createElementNS(SVGNS, name);
+      Object.keys(attrs).forEach(function (k) { e.setAttribute(k, attrs[k]); });
+      if (text !== undefined) e.textContent = text;
+      svg.appendChild(e); return e;
+    }
+    ch.bars.forEach(function (b, i) {
+      var y = top + i * rowH;
+      var w = Math.max(2, plot * b.frac);
+      el('text', { x: L - 10, y: y + 30, 'text-anchor': 'end', class: 'bar-label' }, b.label);
+      el('rect', { x: L, y: y + 8, width: w, height: 30, rx: 4, class: 'bar' });
+      el('text', { x: L + w + 10, y: y + 30, class: 'bar-value' }, yen(b.yen));
+    });
+    if (ch.line) {
+      var x = L + plot * ch.line.frac;
+      el('line', { x1: x, y1: top - 6, x2: x, y2: H - 2, class: 'you-line', 'data-frac': ch.line.frac });
+      el('text', { x: x, y: top - 14, 'text-anchor': ch.line.frac > 0.5 ? 'end' : 'start', class: 'you-label' }, 'この画面 ' + yen(ch.line.yen));
+    }
+    box.appendChild(svg);
   }
 
   var SVGNS = 'http://www.w3.org/2000/svg';
@@ -443,6 +477,8 @@
   // 前提の時点
   (function () {
     $('asof-price').textContent = K.UNIT_PRICE.value + ' 円/kWh・' + K.SOURCES.eftc.publisher.replace('公益社団法人 ', '');
+    var hc = K.HOUSEHOLD.checked.split('-');
+    $('household-src').textContent = '出典: ' + K.SOURCES.kakei2p.publisher + ' 家計調査（' + K.HOUSEHOLD.year + ' 年平均）・確認日 ' + hc[0] + '年' + (+hc[1]) + '月' + (+hc[2]) + '日';
     var d = K.CHECKED.split('-');
     var months = (new Date().getFullYear() - d[0]) * 12 + (new Date().getMonth() + 1 - d[1]);
     if (months >= K.STALE_MONTHS) {
