@@ -182,8 +182,16 @@
     return { label: s.label, axisMax: axisMax, bars: bars, line: line };
   }
 
+  /**
+   * 月ごとの図の出典の期間（値のファイルの最初と最後の月）。'2025-10'〜'2026-09' → '2025年10月〜2026年9月'
+   */
+  function monthlyPeriod(months) {
+    function ym(v) { var a = v.split('-'); return a[0] + '年' + (+a[1]) + '月'; }
+    return ym(months[0]) + '〜' + ym(months[months.length - 1]);
+  }
+
   var Calc = {
-    householdChart: householdChart, monthlyChart: monthlyChart,
+    householdChart: householdChart, monthlyChart: monthlyChart, monthlyPeriod: monthlyPeriod,
     DAYS_PER_MONTH: DAYS_PER_MONTH, monthlyKwh: monthlyKwh, cost: cost, summarize: summarize,
     paybackYears: paybackYears, replacement: replacement, usageChanges: usageChanges,
     backupFileName: backupFileName, buildBackup: buildBackup, parseBackup: parseBackup,
