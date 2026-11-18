@@ -15,7 +15,7 @@ const H = K.HOUSEHOLD;
 test('値: 家計調査 2025 年平均の 1 か月の電気代（区切りは表のまま。2026-11-17 に e-Stat で読んだ額）', () => {
   assert.equal(H.year, 2025);
   assert.match(H.checked, /^\d{4}-\d{2}-\d{2}$/);
-  assert.ok(H.checked <= new Date().toISOString().slice(0, 10));
+  assert.ok(H.checked <= new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 10) /* 今日は日本時間で数える（UTC だと 0〜9 時に当日の確認日で落ちる） */);
   assert.deepEqual(H.rows.map((r) => [r.label, r.yen]), [
     ['1 人', 7337], ['2 人', 12144], ['3 人', 13915], ['4 人', 13928], ['5 人', 15665], ['6 人以上', 17322],
   ]);
