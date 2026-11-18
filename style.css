@@ -142,7 +142,7 @@ html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
 .item-name:hover, .item-name:focus { border-color: var(--input-border); background: var(--card); }
 .item-cost { color: var(--accent); font-weight: 700; white-space: nowrap; }
 .icon-btn { min-width: var(--tap); min-height: var(--tap); border: 0; background: none; color: var(--accent); font-size: var(--fs-l); line-height: 1; padding: 0 var(--sp-2); }
-.item-body { display: flex; flex-wrap: wrap; align-items: flex-end; gap: var(--sp-2) var(--sp-3); margin-top: var(--sp-1); }
+.item-body { display: flex; flex-wrap: wrap; align-items: flex-end; gap: var(--sp-2) var(--sp-3); margin-top: var(--sp-2); }   /* 行の頭（品目の名前・消す ×）と下の欄の間 8px（4px で、開いた時に 1 行 2 組が近すぎた。QUEUE Q-573） */
 .mini { display: flex; flex-direction: column; font-size: var(--fs-s); color: var(--muted); }
 .mini input { padding: var(--sp-1) var(--sp-2); }
 .mini.w3 input { width: 4.4rem; } .mini.w4 input { width: 5.2rem; } .mini.w5 input { width: 6rem; } .mini.w6 input { width: 6.8rem; }
