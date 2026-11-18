@@ -357,6 +357,7 @@
   // 印を引く・← → で「時間/日」が変わる。動かしている間（引いている間と、印にフォーカスがある間）は並びと物差しを変えず、
   // 指を離した時・フォーカスが外れた時に並べ直す
   var BIG_STEP_HOURS = 1;    // Shift と ← → で動かす時間
+  var BIG_STEP_PRICE = 10;   // Shift と ↑ ↓ で動かす、価格の欄の step の数（買い替えの図の印）
   var ROW_PX = 52;           // 1 行の高さ（画面の px）。印の当たり 44 px と、上下の間 8 px
   var rankHold = null;       // 動かしている間の並びと物差し
   var rankDrag = null;       // 引いている印
@@ -536,7 +537,113 @@
     $('r-saving').textContent = filled ? (res.savingYear >= 0 ? '年 ' + yen(res.savingYear) + ' 安く' : '年 ' + yen(-res.savingYear) + ' 高く') : '—';
     $('r-years').textContent = !filled ? '—' : res.years === null ? '元は取れない' : !(num(r.price) > 0) ? '価格を入れてください' : (Math.round(res.years * 10) / 10) + ' 年';
     $('r-detail').textContent = filled ? '今の製品 年 ' + yen(res.oldYenYear) + '（' + kwh(res.oldKwhYear) + '）→ 買い替え後 年 ' + yen(res.newYenYear) + '（' + kwh(res.newKwhYear) + '）。単価 ' + price() + ' 円/kWh で計算。' + (wh ? '' : ' 年間消費電力量は、カタログや本体の表示の値を入れてください。') : '今の製品と、買い替える製品の値を入れてください。';
+    renderPayback(res, filled);
   }
+
+  // --- 買い替えの「元が取れるまで」の図（QUEUE Q-600）: 2 本の線と、買い替える線の左の端の印（価格） ---
+  // 線の値と交わる年は replacement の返り（payback.js は形だけ）。印を引く・↑ ↓ で #rep-price が変わり、欄の入力と同じ道（update）で出し直す
+  var PAY = { W: 640, H: 380, L: 150, R: 24, T: 64, B: 52 };
+  var payHold = null;   // 印にフォーカスが在る間と引いている間の軸の端 { years, top, step }
+  var payDrag = null;
+  var payLast = null;   // 最後に描いた形（印を引く時の縦の端）
+  var payBox = $('rep-chart');
+  var paySvg = document.createElementNS(SVGNS, 'svg');
+  paySvg.setAttribute('viewBox', '0 0 ' + PAY.W + ' ' + PAY.H);
+  paySvg.setAttribute('role', 'img');
+  payBox.appendChild(paySvg);
+  var payMark = document.createElement('button');
+  payMark.type = 'button'; payMark.className = 'pay-mark';
+  payBox.appendChild(payMark);
+  function labelName(id) { return $(id).textContent.replace(/（[^（）]*）$/, ''); }
+  function priceAttrs() { var f = $('rep-price'); return { min: num(f.min), step: num(f.step) || 1 }; }
+  function setPrice(p) {
+    var f = $('rep-price');
+    if (num(f.value) === p && f.value !== '') return;
+    f.value = p; state.rep.price = String(p);
+    update();
+  }
+  function renderPayback(res, filled) {
+    payBox.hidden = !filled;
+    if (!filled) return;
+    var p = num(state.rep.price);
+    var c = Payback.chart(res, p, K.PAYBACK_YEARS, payHold);
+    payLast = c;
+    var g = PAY, pw = g.W - g.L - g.R, ph = g.H - g.T - g.B;
+    function X(t) { return g.L + t / c.years * pw; }
+    function Y(v) { return g.T + ph - Math.min(v, c.top) / c.top * ph; }
+    paySvg.textContent = '';
+    function el(name, attrs, text) {
+      var e = document.createElementNS(SVGNS, name);
+      Object.keys(attrs).forEach(function (k) { e.setAttribute(k, attrs[k]); });
+      if (text !== undefined) e.textContent = text;
+      paySvg.appendChild(e); return e;
+    }
+    c.ticks.forEach(function (v) {
+      el('line', { x1: g.L, x2: g.W - g.R, y1: Y(v), y2: Y(v), class: v === 0 ? 'axis' : 'grid' });
+      el('text', { x: g.L - 50, y: Y(v) + 8, 'text-anchor': 'end', class: 'tick' }, v === 0 ? '0' : (v / 10000) + ' 万円');
+    });
+    c.xTicks.forEach(function (t) {
+      el('text', { x: X(t), y: g.H - 14, 'text-anchor': t === 0 ? 'start' : t === c.years ? 'end' : 'middle', class: 'tick' }, t + ' 年');
+    });
+    function pts(a) { return a.map(function (q) { return X(q[0]).toFixed(1) + ',' + Y(q[1]).toFixed(1); }).join(' '); }
+    el('polyline', { points: pts(c.old), class: 'line-old' });
+    el('polyline', { points: pts(c.neu), class: 'line-new' });
+    // 線の名前（色だけで言わない: 実線と破線の見本を添える）
+    var oldName = labelName('rep-old-label'), newName = labelName('rep-new-label');
+    el('line', { x1: g.L, x2: g.L + 44, y1: 22, y2: 22, class: 'line-old' });
+    el('text', { x: g.L + 54, y: 30, class: 'key' }, oldName);
+    var kx = g.L + 54 + oldName.length * 24 + 36;
+    el('line', { x1: kx, x2: kx + 44, y1: 22, y2: 22, class: 'line-new' });
+    el('text', { x: kx + 54, y: 30, class: 'key' }, newName);
+    if (c.cross !== null) {
+      var cx = X(c.cross), cy = Y(c.cross * res.oldYenYear);
+      el('line', { x1: cx, x2: cx, y1: g.T + ph, y2: cy, class: 'cross' });
+      el('text', { x: cx, y: cy - 14, 'text-anchor': cx > g.W - g.R - 60 ? 'end' : 'middle', class: 'cross-label' }, $('r-years').textContent);
+    }
+    // 左の端の印と、そばの価格（欄の値から）
+    var py = Y(p);
+    el('text', { x: g.L + 30, y: py + (py < g.T + 30 ? 30 : -14), class: 'price-label' }, yen(p));
+    payMark.style.left = (g.L / g.W * 100) + '%';
+    payMark.style.top = (py / g.H * 100) + '%';
+    payMark.setAttribute('aria-label', labelName('rep-price') + ' ' + yen(p));
+    var years = c.old.length - 1;
+    paySvg.setAttribute('aria-label', oldName + ' ' + years + ' 年で ' + yen(c.old[years][1]) + '、' + newName + ' ' + years + ' 年で ' + yen(c.neu[years][1]) + (c.cross !== null ? '、' + $('r-years').textContent : ''));
+  }
+  function payRelease() {
+    payHold = null;
+    if (num(state.rep.old) > 0 && num(state.rep.neu) > 0) renderRep();
+  }
+  payMark.addEventListener('focus', function () { if (payLast) payHold = { years: payLast.years, top: payLast.top, step: payLast.step }; });
+  payMark.addEventListener('blur', function () { if (!payDrag) payRelease(); });
+  payMark.addEventListener('keydown', function (e) {
+    if (e.key !== 'ArrowUp' && e.key !== 'ArrowDown') return;
+    e.preventDefault();
+    var a = priceAttrs();
+    var d = a.step * (e.shiftKey ? BIG_STEP_PRICE : 1) * (e.key === 'ArrowUp' ? 1 : -1);
+    setPrice(Calc.stepHours(state.rep.price, d, a.min, payLast.top, a.step));
+  });
+  payMark.addEventListener('pointerdown', function (e) {
+    if (e.button !== 0) return;
+    try { payMark.setPointerCapture(e.pointerId); } catch (err) { /* 捕まえられなくても、印の上の動きで動かす */ }
+    payMark.focus();
+    payDrag = { id: e.pointerId };
+    e.preventDefault();
+  });
+  payMark.addEventListener('pointermove', function (e) {
+    if (!payDrag || payDrag.id !== e.pointerId || !payLast) return;
+    var box = paySvg.getBoundingClientRect(), g = PAY, ph = g.H - g.T - g.B, a = priceAttrs();
+    var y = (e.clientY - box.top) / box.height * g.H;
+    var v = (g.T + ph - y) / ph * payLast.top;
+    setPrice(Calc.stepHours(Math.max(0, v), 0, a.min, payLast.top, a.step));
+  });
+  function payUp(e) {
+    if (!payDrag || payDrag.id !== e.pointerId) return;
+    payDrag = null;
+    if (document.activeElement !== payMark) payRelease();
+  }
+  payMark.addEventListener('pointerup', payUp);
+  payMark.addEventListener('pointercancel', payUp);
+  document.addEventListener('selectstart', function (e) { if (payDrag) e.preventDefault(); });
   (function renderRepHints() {
     K.REPLACE_HINTS.forEach(function (h) { var li = document.createElement('li'); li.textContent = h.text; $('rep-hints').appendChild(li); });
     var li = document.createElement('li'); li.textContent = '出典：資源エネルギー庁 省エネポータルサイト「機器の買換で省エネ節約」';
