@@ -52,7 +52,7 @@ function runGuideScript() {
 
 test('CHECKED は ISO の日付で、今日より先でない', () => {
   assert.match(K.CHECKED, /^\d{4}-\d{2}-\d{2}$/);
-  assert.ok(K.CHECKED <= new Date().toISOString().slice(0, 10));
+  assert.ok(K.CHECKED <= new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 10) /* 今日は日本時間で数える（UTC だと 0〜9 時に当日の確認日で落ちる） */);
 });
 
 test('guide.html の #checked は空（日付の控えを HTML に持たない）', () => {
