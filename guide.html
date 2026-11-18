@@ -227,7 +227,7 @@
         if (k === 'user') return;
         var x = K.SOURCES[k], li = document.createElement('li'), a = document.createElement('a');
         a.href = x.url; a.rel = 'noopener'; a.target = '_blank'; a.textContent = x.publisher + '「' + x.label + '」';
-        li.appendChild(a); if (x.note) li.appendChild(document.createTextNode('：' + x.note));
+        li.appendChild(a); if (x.note) li.appendChild(document.createTextNode('：' + x.note)); else li.className = 'link-row';
         ul.appendChild(li);
       });
       var NAMES = { aircon: 'エアコン', fridge: '冷蔵庫', tv: 'テレビ', incandescent: '照明', fluorescent: '照明', pot: '電気ポット', toilet: '温水洗浄便座' };
