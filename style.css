@@ -127,7 +127,7 @@ html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
   border-top: 1px solid var(--border);
   margin-top: var(--sp-2);
 }
-.footer-nav ul { list-style: none; display: flex; justify-content: center; flex-wrap: wrap; gap: 0 1.1rem; margin-bottom: var(--sp-2); }
+.footer-nav ul { list-style: none; display: flex; justify-content: center; flex-wrap: wrap; gap: var(--sp-2) 1.1rem; margin-bottom: var(--sp-2); }
 .footer-nav a { display: inline-flex; align-items: center; min-height: var(--tap); color: var(--muted); text-decoration: none; }
 .footer-nav a:hover, .footer-nav a[aria-current="page"] { color: var(--accent); }
 
@@ -167,7 +167,7 @@ h3.sub { margin: var(--sp-3) 0 var(--sp-2); }
 .monthly-pick button { min-width: var(--tap); }
 .monthly-pick button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
 
-.tabs { display: flex; gap: var(--sp-1); border-bottom: 1px solid var(--border); margin-bottom: var(--sp-3); }
+.tabs { display: flex; gap: var(--sp-2); border-bottom: 1px solid var(--border); margin-bottom: var(--sp-3); }
 .tabs button { border: 0; border-bottom: 3px solid transparent; border-radius: 0; background: none; color: var(--muted); padding: 0 var(--sp-3); }
 .tabs button[aria-selected="true"] { color: var(--accent); border-bottom-color: var(--accent); }
 .tips { padding-left: 1.3rem; }
