@@ -190,7 +190,40 @@
     return ym(months[0]) + '〜' + ym(months[months.length - 1]);
   }
 
+  // --- ランキングの棒の印（Q-511）: 印を動かすと、その家電の「時間/日」が変わる ---
+  // 範囲と刻み（min・max・step）は画面の時間の欄の属性を渡す。額は summarize から取り、ここでは額を計算しない
+
+  /** 棒の長さ（物差しの額を 1）。物差しが 0 なら 0。cap を渡すとそこで止める（動かしている間は物差しを変えないので 1 を超えることがある） */
+  function rankFrac(yen, max, cap) {
+    var f = max > 0 && yen > 0 ? yen / max : 0;
+    return cap > 0 ? Math.min(cap, f) : f;
+  }
+
+  /** 時間を delta だけ動かす。刻みにそろえ、min と max で止める */
+  function stepHours(hours, delta, min, max, step) {
+    var h = num(hours) + delta;
+    if (step > 0) h = Math.round(h / step) * step;
+    h = Math.round(h * 1e6) / 1e6;
+    return Math.min(max, Math.max(min, h));
+  }
+
+  /**
+   * 引いた位置（棒の長さ frac）にいちばん近い時間。min〜maxH の刻みを全部試す
+   * yenAt(h) は時間 h のときのその家電の月の額（画面が summarize を呼ぶ）。同じ近さなら今の時間 current に近いほう
+   */
+  function hoursAtFrac(frac, yenAt, max, min, maxH, step, current) {
+    var cur = num(current), best = cur, bestD = Infinity;
+    var n = step > 0 ? Math.round((maxH - min) / step) : 0;
+    for (var k = 0; k <= n; k++) {
+      var h = Math.round((min + k * step) * 1e6) / 1e6;
+      var d = Math.abs(rankFrac(yenAt(h), max) - frac);
+      if (d < bestD - 1e-12 || (Math.abs(d - bestD) <= 1e-12 && Math.abs(h - cur) < Math.abs(best - cur))) { best = h; bestD = d; }
+    }
+    return best;
+  }
+
   var Calc = {
+    rankFrac: rankFrac, stepHours: stepHours, hoursAtFrac: hoursAtFrac,
     householdChart: householdChart, monthlyChart: monthlyChart, monthlyPeriod: monthlyPeriod,
     DAYS_PER_MONTH: DAYS_PER_MONTH, monthlyKwh: monthlyKwh, cost: cost, summarize: summarize,
     paybackYears: paybackYears, replacement: replacement, usageChanges: usageChanges,

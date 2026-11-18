@@ -353,32 +353,146 @@
   }
 
   var SVGNS = 'http://www.w3.org/2000/svg';
+  // ランキング: 1 家電 1 本の横棒（物差しはいちばん額の多い家電）。W × 時間の家電は棒の右の端に印（Q-511）
+  // 印を引く・← → で「時間/日」が変わる。動かしている間（引いている間と、印にフォーカスがある間）は並びと物差しを変えず、
+  // 指を離した時・フォーカスが外れた時に並べ直す
+  var BIG_STEP_HOURS = 1;    // Shift と ← → で動かす時間
+  var ROW_PX = 52;           // 1 行の高さ（画面の px）。印の当たり 44 px と、上下の間 8 px
+  var rankHold = null;       // 動かしている間の並びと物差し
+  var rankDrag = null;       // 引いている印
+  var rankRebuilding = false;
+  var lastRankSum = null;
+  function markable(it) { return !!it && it.method !== 'annual' && num(it.watt) > 0; }
+  function hoursAttrs(i) {
+    var inp = document.querySelector('input[data-hours="' + i + '"]');
+    return { min: num(inp && inp.min), max: num(inp && inp.max), step: num(inp && inp.step) };
+  }
+  function markLabel(i) { return state.items[i].name + 'の 1 日の使用時間 ' + num(state.items[i].hours) + ' 時間'; }
+  function rankName(r) { return r.name.length > 9 ? r.name.slice(0, 8) + '…' : r.name; }
+  function setHours(i, h) {
+    var it = state.items[i];
+    if (num(it.hours) === h && it.hours !== '') return;
+    it.hours = h;
+    document.querySelectorAll('input[data-hours="' + i + '"]').forEach(function (e) { e.value = h; });
+    update();
+  }
   function renderRanking(sum) {
+    lastRankSum = sum;
+    if (rankHold && rankHold.order.every(function (i) { return sum.rows[i]; }) && rankHold.count === sum.rows.length) { moveRanking(sum); return; }
+    rankHold = null;
     var box = $('ranking');
+    var focused = document.activeElement && document.activeElement.classList.contains('rank-mark') ? +document.activeElement.dataset.index : null;
+    rankRebuilding = true;
     box.textContent = '';
-    var rows = sum.ranking.filter(function (r) { return r.yenMonth > 0; });
+    rankRebuilding = false;
+    var rows = sum.ranking.filter(function (r) { return r.yenMonth > 0 || markable(state.items[r.index]); });
     if (!rows.length) { var p = document.createElement('p'); p.className = 'small'; p.textContent = '値を入れると、ここに多い順で並びます。'; box.appendChild(p); return; }
-    var W = 640, rowH = 52, L = 250, R = 150, H = rows.length * rowH + 6;
-    var max = rows[0].yenMonth;
+    // 1 行の高さは画面で ROW_PX 以上に（狭い画面では図が縮むので、そのぶん図の中の行を高くする）
+    var W = 640, scale = (box.clientWidth || W) / W;
+    var rowH = Math.max(ROW_PX, Math.ceil(ROW_PX / scale)), gap = Math.ceil((44 / 2 + 12) / scale);
+    var L = 250, R = 140 + gap, H = rows.length * rowH + 6, plot = W - L - R;
+    var g = { W: W, H: H, L: L, plot: plot, gap: gap, rowH: rowH, cap: (W - L - 8) / plot, max: rows[0].yenMonth, els: {} };
     var svg = document.createElementNS(SVGNS, 'svg');
     svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
     svg.setAttribute('role', 'img');
-    svg.setAttribute('aria-label', '1 か月の電気代の多い順：' + rows.map(function (r) { return r.name + ' ' + yen(r.yenMonth); }).join('、'));
     function el(name, attrs, text) {
       var e = document.createElementNS(SVGNS, name);
       Object.keys(attrs).forEach(function (k) { e.setAttribute(k, attrs[k]); });
       if (text !== undefined) e.textContent = text;
       svg.appendChild(e); return e;
     }
-    rows.forEach(function (r, i) {
-      var y = i * rowH + 6;
-      var w = Math.max(2, (W - L - R) * r.yenMonth / max);
-      el('text', { x: L - 10, y: y + 34, 'text-anchor': 'end', class: 'bar-label' }, r.name.length > 9 ? r.name.slice(0, 8) + '…' : r.name);
-      el('rect', { x: L, y: y + 8, width: w, height: 34, rx: 5, class: 'bar' });
-      el('text', { x: L + w + 10, y: y + 34, class: 'bar-value' }, yen(r.yenMonth));
+    rows.forEach(function (r, k) {
+      var y = k * rowH + (rowH - 34) / 2 + 3;
+      el('text', { x: L - 10, y: y + 26, 'text-anchor': 'end', class: 'bar-label' }, rankName(r));
+      g.els[r.index] = {
+        y: y,
+        rect: el('rect', { x: L, y: y, width: 2, height: 34, rx: 5, class: 'bar', 'data-index': r.index }),
+        text: el('text', { y: y + 26, class: 'bar-value' }),
+      };
     });
     box.appendChild(svg);
+    rows.forEach(function (r) {
+      if (!markable(state.items[r.index])) return;
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'rank-mark'; b.dataset.index = r.index;
+      b.style.top = ((g.els[r.index].y + 17) / H * 100) + '%';
+      b.addEventListener('focus', onMarkFocus);
+      b.addEventListener('blur', onMarkBlur);
+      b.addEventListener('keydown', onMarkKey);
+      b.addEventListener('pointerdown', onMarkDown);
+      b.addEventListener('pointermove', onMarkMove);
+      b.addEventListener('pointerup', onMarkUp);
+      b.addEventListener('pointercancel', onMarkUp);
+      box.appendChild(b);
+      g.els[r.index].mark = b;
+    });
+    g.svg = svg;
+    g.order = rows.map(function (r) { return r.index; });
+    g.count = sum.rows.length;
+    rankGeom = g;
+    drawRanking(g, sum);
+    if (focused !== null && g.els[focused] && g.els[focused].mark) g.els[focused].mark.focus();
   }
+  var rankGeom = null;
+  // 棒の長さ・額の字・印の位置だけを書き換える（並びと物差しは g のまま）
+  function drawRanking(g, sum) {
+    g.order.forEach(function (i) {
+      var r = sum.rows[i], e = g.els[i];
+      var w = Math.max(2, g.plot * Calc.rankFrac(r.yenMonth, g.max, g.cap));
+      e.rect.setAttribute('width', w);
+      e.text.setAttribute('x', g.L + w + g.gap);
+      e.text.textContent = yen(r.yenMonth);
+      if (e.mark) {
+        e.mark.style.left = ((g.L + w) / g.W * 100) + '%';
+        e.mark.setAttribute('aria-label', markLabel(i));
+      }
+    });
+    g.svg.setAttribute('aria-label', '1 か月の電気代の多い順：' + g.order.map(function (i) { return sum.rows[i].name + ' ' + yen(sum.rows[i].yenMonth); }).join('、'));
+  }
+  function moveRanking(sum) { drawRanking(rankGeom, sum); }
+  function onMarkFocus() { if (!rankHold && rankGeom) rankHold = rankGeom; }
+  function onMarkBlur(e) {
+    if (rankRebuilding || rankDrag) return;
+    var next = e.relatedTarget && e.relatedTarget.classList && e.relatedTarget.classList.contains('rank-mark') ? +e.relatedTarget.dataset.index : null;
+    rankHold = null;
+    if (!lastRankSum) return;
+    renderRanking(lastRankSum);
+    if (next !== null && rankGeom.els[next] && rankGeom.els[next].mark) rankGeom.els[next].mark.focus();
+  }
+  function onMarkKey(e) {
+    if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+    e.preventDefault();
+    var i = +this.dataset.index, a = hoursAttrs(i);
+    var d = (e.shiftKey ? BIG_STEP_HOURS : a.step) * (e.key === 'ArrowRight' ? 1 : -1);
+    setHours(i, Calc.stepHours(state.items[i].hours, d, a.min, a.max, a.step));
+  }
+  function onMarkDown(e) {
+    if (e.button !== 0) return;
+    try { this.setPointerCapture(e.pointerId); } catch (err) { /* 捕まえられなくても、印の上の動きで動かす */ }
+    this.focus();
+    rankDrag = { id: e.pointerId };
+    e.preventDefault();
+  }
+  function onMarkMove(e) {
+    if (!rankDrag || rankDrag.id !== e.pointerId || !rankGeom) return;
+    var g = rankGeom, i = +this.dataset.index, a = hoursAttrs(i), it = state.items[i];
+    var box = g.svg.getBoundingClientRect();
+    var frac = Math.min(g.cap, Math.max(0, ((e.clientX - box.left) / box.width * g.W - g.L) / g.plot));
+    var h = Calc.hoursAtFrac(frac, function (v) {
+      return Calc.summarize([calcItem(Object.assign({}, it, { hours: v }))], price()).rows[0].yenMonth;
+    }, g.max, a.min, a.max, a.step, it.hours);
+    setHours(i, h);
+  }
+  function onMarkUp(e) {
+    if (!rankDrag || rankDrag.id !== e.pointerId) return;
+    rankDrag = null;
+    var i = +this.dataset.index;
+    rankHold = null;
+    renderRanking(lastRankSum);   // 並べ直す。フォーカスは同じ家電の印に戻す
+    if (rankGeom && rankGeom.els[i] && rankGeom.els[i].mark) rankGeom.els[i].mark.focus();
+  }
+  document.addEventListener('selectstart', function (e) { if (rankDrag) e.preventDefault(); });   // 引いている間に字を選ばない
+  window.addEventListener('resize', function () { if (!rankHold && lastRankSum) renderRanking(lastRankSum); });
 
   // --- 使い方の見直し ---
   $('cut-hours').addEventListener('change', function (e) { state.cutHours = +e.target.value; update(); });
@@ -516,10 +630,11 @@
   }
 
   // --- 全体の更新 ---
+  // summarize に渡す形（欄の字を数に）。ランキングの印を引く時も同じ形で額を取る
+  function calcItem(it) { return { name: it.name, method: it.method, watt: num(it.watt), hours: num(it.hours), days: num(it.days), standbyW: num(it.standbyW), annualKwh: num(it.annualKwh), qty: num(it.qty) || 1 }; }
   function update() {
     if (!fromShare) store.set('draft', state);
-    var items = state.items.map(function (it) { return { name: it.name, method: it.method, watt: num(it.watt), hours: num(it.hours), days: num(it.days), standbyW: num(it.standbyW), annualKwh: num(it.annualKwh), qty: num(it.qty) || 1 }; });
-    renderResult(Calc.summarize(items, price()));
+    renderResult(Calc.summarize(state.items.map(calcItem), price()));
     renderTips();
     renderRep();
     syncShare();
