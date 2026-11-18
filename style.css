@@ -115,7 +115,6 @@ html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
 .faq dt::before { content: 'Q. '; color: var(--accent); }
 .faq dd { color: var(--muted); padding: var(--sp-1) 0 var(--sp-2) 1.2rem; border-bottom: 1px solid var(--border); }
 .small { font-size: var(--fs-s); color: var(--muted); margin-top: var(--sp-2); }
-.small a, .center a, .content p a { display: inline-flex; align-items: center; min-height: var(--tap); }
 .center { text-align: center; }
 
 /* フッター */
@@ -254,6 +253,7 @@ details.card.opt[open] > summary { border-bottom: 1px solid var(--border); margi
   main details > summary::before { content: none; }
 }
 
-/* 1 行に 1 つのリンク（使い方への行・案内のカード・説明の無い出典・フッター）も押せる高さに（DESIGN の 44px。K192 段 3 の 4 の検収）。
-   箱を名指しする。裸の :where(p, li) は、親が字を持つ文中のリンクにも当たる（yorozu-plans QUEUE Q-518） */
-:where(html:not([data-skin="base"])) :where(p.card, .link-row, .footer-nav li) > a:only-child { display: inline-flex; align-items: center; min-height: var(--tap); }
+/* 1 行に 1 つのリンク（説明の無い出典・フッター）も押せる高さに（DESIGN の 44px。K192 段 3 の 4 の検収）。
+   箱を名指しする。裸の :where(p, li) は、親が字を持つ文中のリンクにも当たる（yorozu-plans QUEUE Q-518）。
+   案内のカード（p.card）は共通の枠の土台の層が持つので並べない。文中のリンクは inline のまま（Q-540） */
+:where(html:not([data-skin="base"])) :where(.link-row, .footer-nav li) > a:only-child { display: inline-flex; align-items: center; min-height: var(--tap); }
