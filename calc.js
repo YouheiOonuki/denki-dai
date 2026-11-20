@@ -126,12 +126,12 @@
     if (o.version !== BACKUP_VERSION) {
       return { ok: false, error: typeof o.version === 'number' && o.version > BACKUP_VERSION
         ? '新しい版のツールで書き出したファイルのため読み込めません。ページを再読み込みしてから、もう一度お試しください。'
-        : 'ファイルの形式が正しくないため読み込めません。' };
+        : 'ファイルの形式が正しくないため読み込めません。この道具の「ファイルに書き出す」で保存したファイルを選んでください。' };
     }
     var data = o.data;
     var missing = !data || typeof data !== 'object' || Array.isArray(data) ||
       (requiredKeys || []).some(function (k) { return data[k] === undefined || data[k] === null; });
-    if (missing) return { ok: false, error: 'ファイルの中身が足りないため読み込めません。' };
+    if (missing) return { ok: false, error: 'ファイルの中身が足りないため読み込めません。この道具の「ファイルに書き出す」で保存したファイルを選んでください。' };
     return { ok: true, data: data };
   }
 
