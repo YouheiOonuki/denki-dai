@@ -1,21 +1,28 @@
 // 「保存した内容をすべて消す（初期状態に戻す）」ボタン（reset-storage.js。yorozu-plans ROADMAP K123）のテスト
+// このファイルは repo の値を持たない。接頭辞と旧キーはページのボタン（data-reset-storage / data-reset-legacy）から読む（yorozu-plans D668・Q-858）
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const R = require('../reset-storage.js');
 
-// このツールのキーの接頭辞と、接頭辞の無い旧キー（ボタンの data-reset-storage / data-reset-legacy と同じもの）
-const PREFIXES = ["denki-dai_"];
-const LEGACY = [];
-// 画面ごとに消す範囲を分けるページ（1 つのリポジトリに別々の道具があるとき）。書いていないページは PREFIXES
-const PAGE_PREFIXES = {};
-const PAGE_LEGACY = {};
-// reset-storage.js を <script src> ではなく、ページの中に埋め込んでいるページ（1 ファイルにビルドするもの）
-const INLINE = [];
+// reset-storage.js を <script src> ではなく、ページの中に埋め込んでいるページ（1 ファイルにビルドするもの）は、この印で見分ける
+const INLINE_MARK = 'root.ResetStorage = api;';
 const INLINE_SRC = "reset-storage.js";
 const ROOT = path.join(__dirname, "..");
 const SKIP_DIRS = new Set(['node_modules', 'tests', 'test', '.git', '.github', 'tools']);
+
+function resetButton(html) {
+  const btn = /<button\b[^>]*\bdata-reset-storage="([^"]*)"[^>]*>([\s\S]*?)<\/button>/.exec(html);
+  if (!btn) return null;
+  const legacy = /\bdata-reset-legacy="([^"]*)"/.exec(btn[0]);
+  return { prefixes: R.splitList(btn[1]), legacy: legacy ? R.splitList(legacy[1]) : [], label: btn[2].replace(/<[^>]+>/g, '').trim() };
+}
+
+// このツールの接頭辞と、接頭辞の無い旧キー: 最上位のページ（index.html）のボタンの値。画面ごとに消す範囲を分けるページは、この接頭辞で始まる別の値を持つ
+const TOP = fs.existsSync(path.join(ROOT, 'index.html')) ? resetButton(fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8')) : null;
+const PREFIXES = TOP ? TOP.prefixes : [];
+const LEGACY = TOP ? TOP.legacy : [];
 
 function fakeStorage(init) {
   const m = new Map(Object.entries(init));
@@ -30,6 +37,7 @@ function fakeStorage(init) {
 }
 
 test('消すのはこのツールの接頭辞のキー（と旧キー）だけで、ほかのツールのキーは残す', () => {
+  assert.ok(PREFIXES.length > 0, 'index.html に data-reset-storage のボタンが無い');
   const init = { 'zz-other-tool_x': '1', 'zzother_theme': 'dark', 'unrelated': 'u' };
   for (const p of PREFIXES) { init[p + 'a'] = '1'; init[p + 'b'] = '2'; }
   for (const k of LEGACY) init[k] = 'old';
@@ -75,18 +83,13 @@ test('localStorage を使うページには、消すボタンと reset-storage.j
   for (const f of pages) {
     const html = fs.readFileSync(f, 'utf8');
     const rel = path.relative(ROOT, f);
-    const btn = /<button\b[^>]*\bdata-reset-storage="([^"]*)"[^>]*>([\s\S]*?)<\/button>/.exec(html);
+    const btn = resetButton(html);
     assert.ok(btn, rel + ' に data-reset-storage のボタンが無い');
-    const want = PAGE_PREFIXES[rel.split(path.sep).join('/')] || PREFIXES;
-    assert.deepEqual(R.splitList(btn[1]), want, rel + ' の接頭辞');
-    for (const p of want) assert.ok(PREFIXES.some((q) => p.startsWith(q)), rel + ' の ' + p + ' はこのツールの接頭辞で始まらない');
-    const legacy = /\bdata-reset-legacy="([^"]*)"/.exec(btn[0]);
-    assert.deepEqual(legacy ? R.splitList(legacy[1]) : [], PAGE_LEGACY[rel.split(path.sep).join('/')] || LEGACY, rel + ' の旧キー');
-    const label = btn[2].replace(/<[^>]+>/g, '').trim();
-    assert.ok(label === '保存した内容をすべて消す（初期状態に戻す）' || label === 'Delete everything saved (reset)', rel + ' の文言: ' + label);
-    if (INLINE.includes(rel.split(path.sep).join('/'))) {
-      assert.ok(fs.readFileSync(path.join(ROOT, INLINE_SRC), 'utf8').includes('root.ResetStorage = api;'));
-      assert.ok(html.includes('root.ResetStorage = api;'), rel + ' に ' + INLINE_SRC + ' が埋め込まれていない');
+    assert.ok(btn.prefixes.length > 0, rel + ' の接頭辞が空');
+    for (const p of btn.prefixes) assert.ok(PREFIXES.some((q) => p.startsWith(q)), rel + ' の ' + p + ' はこのツールの接頭辞（index.html のボタン）で始まらない');
+    assert.ok(btn.label === '保存した内容をすべて消す（初期状態に戻す）' || btn.label === 'Delete everything saved (reset)', rel + ' の文言: ' + btn.label);
+    if (html.includes(INLINE_MARK)) {
+      assert.ok(fs.readFileSync(path.join(ROOT, INLINE_SRC), 'utf8').includes(INLINE_MARK));
       continue;
     }
     const src = /<script\b[^>]*\bsrc="([^"]*reset-storage\.js)"/.exec(html);
