@@ -1,0 +1,11 @@
+{
+  "src": "reset-storage.js",
+  "prefixes": [
+    "denki-dai_"
+  ],
+  "legacy": [],
+  "pagePrefixes": {},
+  "pageLegacy": {},
+  "inline": [],
+  "skipDirs": []
+}
