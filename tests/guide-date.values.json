@@ -1,0 +1,11 @@
+{
+  "drawn": {
+    "guide.html": {
+      "src": "./constants.js",
+      "values": "constants.js",
+      "ids": [
+        "checked"
+      ]
+    }
+  }
+}
