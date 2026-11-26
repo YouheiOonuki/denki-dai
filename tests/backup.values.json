@@ -1,0 +1,25 @@
+{
+  "module": "calc.js",
+  "tool": "denki-dai",
+  "data": {
+    "draft": {
+      "unitPrice": 31,
+      "items": [
+        {
+          "key": "aircon",
+          "name": "エアコン",
+          "method": "wh",
+          "watt": 600,
+          "hours": 8,
+          "days": 30,
+          "qty": 2
+        }
+      ],
+      "cutHours": 1,
+      "tab": "usage"
+    }
+  },
+  "required": [
+    "draft"
+  ]
+}
